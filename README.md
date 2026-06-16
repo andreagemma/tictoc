@@ -1,118 +1,122 @@
 # tictoc
 
-`tictoc` aiuta a misurare il tempo di esecuzione di un programma Python, stimare
-quanto manca alla fine di un ciclo, leggere velocita di elaborazione e scrivere
-log di avanzamento gia formattati.
+`tictoc` helps you measure elapsed time in Python programs, estimate how long a
+loop or job still needs, inspect processing speed, and log progress messages
+with readable timing information.
 
-La classe principale e `TicToc`: appena viene creata inizia a contare.
+The main class is `TicToc`. It starts counting as soon as you create it.
 
 ```python
 from tictoc import TicToc
 
 timer = TicToc()
 
-# codice da misurare
+# Code you want to measure
 
 print(timer.toc())
 ```
 
-Output leggibile, per esempio:
+Example output:
 
 ```text
 00:01:12
 ```
 
-## Installazione
+For a complete guide to all classes, methods, placeholders, parsing formats,
+casts, comparisons, and arithmetic operations, see
+[docs/usage.md](docs/usage.md).
 
-Da PyPI, quando il pacchetto e pubblicato:
+## Installation
+
+Install from PyPI, once the package is published:
 
 ```bash
 python -m pip install tictoc
 ```
 
-Da una release GitHub:
+Install from a GitHub release:
 
 ```bash
-python -m pip install "https://github.com/<owner>/<repo>/releases/download/v0.1.0/tictoc-0.1.0-py3-none-any.whl"
+python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.1.0/tictoc-0.1.0-py3-none-any.whl"
 ```
 
-Da sorgente locale:
+Install from a local source checkout:
 
 ```bash
 python -m pip install -e .
 ```
 
-Per riconoscere formati data molto liberi, installa anche il parser opzionale:
+For more flexible date string parsing, install the optional parser support:
 
 ```bash
 python -m pip install "tictoc[dateutil]"
 ```
 
-## Uso Rapido
+## Quick Start
 
-### Misurare il tempo trascorso
+### Measure Elapsed Time
 
 ```python
 from tictoc import TicToc
 
 tt = TicToc()
 
-# lavoro...
+# Work...
 
 elapsed = tt.toc()
-print(elapsed)          # valore umanizzato
-print(elapsed.seconds)  # secondi totali
+print(elapsed)          # Human-readable value
+print(elapsed.seconds)  # Total seconds
 ```
 
-`toc()` e un alias di `elapsed_time()`.
+`toc()` is an alias for `elapsed_time()`.
 
 ```python
 tt.elapsed_time()
 tt.elapsed_origin_time()
 ```
 
-`elapsed_time()` misura dal tic piu recente.  
-`elapsed_origin_time()` misura dalla creazione del timer.
+`elapsed_time()` measures from the most recent `tic()`.  
+`elapsed_origin_time()` measures from the moment the timer was created.
 
-### Resettare il timer
+### Reset the Timer
 
-`tic()` resetta l'inizio del conteggio e restituisce lo stesso oggetto, quindi
-puo essere usato in method chaining.
+`tic()` resets the start time and returns the same object, so it works well with
+method chaining.
 
 ```python
 tt = TicToc()
 
-tt.tic().info("riparto da zero")
+tt.tic().info("starting again")
 ```
 
-### Timer con nome
+### Named Timers
 
-Un oggetto `TicToc` puo gestire piu misure indipendenti.
+One `TicToc` object can manage multiple independent named timers.
 
 ```python
 tt = TicToc()
 
 tt.tic("download")
-# scaricamento...
+# Download...
 
 tt.tic("parse")
-# parsing...
+# Parse...
 
 print(tt.toc("download"))
 print(tt.toc("parse"))
 ```
 
-Puoi anche accedere al timer named:
+You can also access a named timer directly:
 
 ```python
 download_timer = tt["download"]
 print(download_timer.elapsed_time())
 ```
 
-## Avanzamento, ETA e Velocita
+## Progress, ETA, and Speed
 
-Quando conosci il numero totale di step, `TicToc` puo stimare tempo residuo,
-tempo totale, ora di fine e velocita.
+When you know the total number of steps, `TicToc` can estimate remaining time,
+total time, end time, and processing speed.
 
 ```python
 from tictoc import TicToc
@@ -120,7 +124,7 @@ from tictoc import TicToc
 tt = TicToc(total=100)
 
 for i in range(1, 101):
-    # elabora uno step
+    # Process one step
     if i % 10 == 0:
         print(
             i,
@@ -132,17 +136,17 @@ for i in range(1, 101):
         )
 ```
 
-Metodi utili:
+Useful methods:
 
-- `remaining_time(i=..., total=...)`: stima il tempo mancante.
-- `total_time(i=..., total=...)`: stima il tempo totale.
-- `end_time(i=..., total=...)`: stima l'istante di fine.
-- `speed(i=...)`: restituisce una `TicTocSpeed`.
-- `percent(i=..., total=...)`: percentuale di completamento.
+- `remaining_time(i=..., total=...)`: estimate time left.
+- `total_time(i=..., total=...)`: estimate total execution time.
+- `end_time(i=..., total=...)`: estimate when the job will finish.
+- `speed(i=...)`: return a `TicTocSpeed` object.
+- `percent(i=..., total=...)`: return completion percentage.
 
-### Metodi di stima
+### Estimation Methods
 
-Puoi scegliere come stimare il tempo residuo con `method`.
+Choose how remaining time should be estimated with `method`.
 
 ```python
 tt.remaining_time(i=i, total=100, method="origin")
@@ -151,15 +155,15 @@ tt.remaining_time(i=i, total=100, method="moving", n=5)
 tt.remaining_time(i=i, total=100, method="ema", n=5)
 ```
 
-- `origin`: usa la media dall'ultimo `tic`.
-- `last`: usa l'ultimo intervallo tra due aggiornamenti.
-- `moving`: usa la media degli ultimi `n` aggiornamenti.
-- `ema`: usa una media mobile esponenziale.
+- `origin`: average speed since the latest `tic()`.
+- `last`: speed from the latest interval between two updates.
+- `moving`: average speed over the latest `n` updates.
+- `ema`: exponential moving average over the latest updates.
 
-## Logging Integrato
+## Built-In Logging
 
-`TicToc` funziona anche come logger. Se non passi un logger, usa un logger
-interno chiamato `tictoc`.
+`TicToc` can also log progress. If you do not pass a logger, it uses an internal
+logger named `tictoc`.
 
 ```python
 import logging
@@ -170,13 +174,13 @@ logging.basicConfig(level=logging.INFO)
 tt = TicToc(total=50)
 
 for i in range(1, 51):
-    # lavoro...
+    # Work...
     tt.info("{i}/{tot} elapsed={et} eta={rt} speed={v}", i=i, each=10)
 ```
 
-`each=10` scrive il log solo ogni 10 step.
+`each=10` logs only every 10 steps.
 
-Sono disponibili i metodi:
+Available logging methods:
 
 ```python
 tt.debug("...")
@@ -186,31 +190,41 @@ tt.error("...")
 tt.exception("...")
 ```
 
-### Placeholder per i log
+You can also pass your own logger:
 
-Nei messaggi puoi usare placeholder rapidi.
+```python
+import logging
+from tictoc import TicToc
 
-| Placeholder | Significato |
+logger = logging.getLogger("my-job")
+tt = TicToc(logger=logger)
+```
+
+### Log Placeholders
+
+Progress messages support quick placeholders.
+
+| Placeholder | Meaning |
 | --- | --- |
-| `{i}` o `{counter}` | step corrente |
-| `{tot}` o `{total}` | totale step |
-| `{percent_str}` | percentuale formattata |
+| `{i}` or `{counter}` | current step |
+| `{tot}` or `{total}` | total steps |
+| `{percent_str}` | formatted percentage |
 | `{et}` | elapsed time |
 | `{eot}` | elapsed origin time |
 | `{rt}` | remaining time |
-| `{tt}` | total time stimato |
-| `{v}` | velocita |
-| `{start}` | istante di start |
-| `{origin}` | istante di creazione |
-| `{end}` | istante stimato di fine |
+| `{tt}` | estimated total time |
+| `{v}` | speed |
+| `{start}` | start time |
+| `{origin}` | object creation time |
+| `{end}` | estimated end time |
 
-Per ottenere valori numerici usa i suffissi:
+Use suffixes when you want numeric values:
 
 ```python
 tt.info("elapsed={et_s:.2f}s eta={rt_m:.1f}min speed={v_h:.0f}/h", i=i)
 ```
 
-Suffissi comuni:
+Common suffixes:
 
 - `_s`, `_sec`, `_seconds`
 - `_m`, `_min`, `_minutes`
@@ -218,9 +232,9 @@ Suffissi comuni:
 - `_d`, `_days`
 - `_str`
 
-## Intervalli: TicTocInterval
+## Intervals: TicTocInterval
 
-`TicTocInterval` rappresenta una durata.
+`TicTocInterval` represents a duration.
 
 ```python
 from datetime import timedelta
@@ -228,16 +242,16 @@ from tictoc import TicTocInterval
 
 a = TicTocInterval("1 day 2 hours")
 b = TicTocInterval(timedelta(minutes=30))
-c = TicTocInterval(10)  # secondi
+c = TicTocInterval(10)  # Seconds
 
 print(a + b)
 print(c * 3)
-print(float(a))         # secondi totali
+print(float(a))         # Total seconds
 print(a.total_hours)
 print(a.component_days)
 ```
 
-Formati accettati:
+Accepted formats include:
 
 ```python
 TicTocInterval("1 day 2 seconds")
@@ -247,9 +261,9 @@ TicTocInterval("1.02:00:53")
 TicTocInterval("PT1H30M")
 ```
 
-## Istanti: TicTocTime
+## Timestamps: TicTocTime
 
-`TicTocTime` rappresenta un istante temporale.
+`TicTocTime` represents a point in time.
 
 ```python
 from datetime import datetime, timedelta
@@ -265,7 +279,7 @@ print(start.year, start.month, start.day)
 print(float(start))   # Unix timestamp
 ```
 
-Puoi creare un `TicTocTime` da:
+You can create a `TicTocTime` from:
 
 ```python
 TicTocTime.now()
@@ -274,9 +288,10 @@ TicTocTime.from_datetime(datetime.now())
 TicTocTime.from_string("2026-06-16 12:00:00")
 ```
 
-## Velocita: TicTocSpeed
+## Speed: TicTocSpeed
 
-`TicTocSpeed` rappresenta step al secondo, con conversioni pronte.
+`TicTocSpeed` represents steps per second and gives you ready-to-use
+conversions.
 
 ```python
 from tictoc import TicTocSpeed, TicTocInterval
@@ -289,7 +304,7 @@ print(speed.steps_per_minute)
 print(speed.steps_per_hour)
 ```
 
-## Esempio Completo
+## Complete Example
 
 ```python
 import logging
@@ -309,15 +324,15 @@ for i in range(1, 21):
         each=5,
     )
 
-print("finito in", tt.elapsed_time())
+print("finished in", tt.elapsed_time())
 ```
 
-Esempio di output:
+Example output:
 
 ```text
 5/20 (25.0%) elapsed=0.501 s eta=1.5 s end=2026-06-16 12:00:03 speed=10 steps/s
 10/20 (50.0%) elapsed=1 s eta=1 s end=2026-06-16 12:00:03 speed=10 steps/s
 15/20 (75.0%) elapsed=1.5 s eta=0.5 s end=2026-06-16 12:00:03 speed=10 steps/s
 20/20 (100.0%) elapsed=2 s eta=0 s end=2026-06-16 12:00:03 speed=10 steps/s
-finito in 2 s
+finished in 2 s
 ```
