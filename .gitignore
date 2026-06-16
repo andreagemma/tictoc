@@ -1,32 +1,61 @@
-# Bytecode and caches
+# Python bytecode and caches
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.pytype/
+.hypothesis/
 
-# Build outputs
-build/
-dist/
-*.egg-info/
-.eggs/
-
-# Virtual environments
+# Virtual environments - never commit these
 .venv/
 venv/
 env/
+ENV/
+.env/
+.envrc
 
-# Tooling and local files
-.coverage
-coverage.xml
-htmlcov/
+# Local environment files
 .env
 .env.*
 !.env.example
 
-# Editors and OS
+# Packaging and build artifacts
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+*.whl
+*.tar.gz
+pip-wheel-metadata/
+
+# Test and coverage output
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Local installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Type checker local state
+.dmypy.json
+dmypy.json
+
+# IDEs and editors
 .idea/
 .vscode/
+*.swp
+*.swo
+
+# OS files
 Thumbs.db
+Desktop.ini
 .DS_Store
