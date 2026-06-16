@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tictoc"
+version = "0.1.0"
+description = "Modern timer, interval, timestamp and progress logging utilities."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "tictoc contributors" }]
+keywords = ["timer", "time", "progress", "logging", "eta"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Logging",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dateutil = ["python-dateutil>=2.8"]
+build = ["build>=1", "twine>=5"]
+test = ["python-dateutil>=2.8"]
+
+[project.urls]
+Homepage = "https://github.com/example/tictoc"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+tictoc = ["py.typed"]
+
+[tool.unittest]
+start-directory = "tests"
