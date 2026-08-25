@@ -1,8 +1,10 @@
-# tictoc
+# ga-tictoc
 
-`tictoc` helps you measure elapsed time in Python programs, estimate how long a
+`ga-tictoc` helps you measure elapsed time in Python programs, estimate how long a
 loop or job still needs, inspect processing speed, and log progress messages
 with readable timing information.
+
+The distribution is named `ga-tictoc`; the Python import remains `tictoc`.
 
 The main class is `TicToc`. It starts counting as soon as you create it.
 
@@ -26,18 +28,21 @@ For a complete guide to all classes, methods, placeholders, parsing formats,
 casts, comparisons, and arithmetic operations, see
 [docs/usage.md](docs/usage.md).
 
+Release maintainers can find the PyPI publishing setup in
+[docs/publishing.md](docs/publishing.md).
+
 ## Installation
 
-Install from PyPI, once the package is published:
+Install or upgrade to the latest stable release from PyPI:
 
 ```bash
-python -m pip install tictoc
+python -m pip install --upgrade ga-tictoc
 ```
 
 Install from a GitHub release:
 
 ```bash
-python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.1.0/tictoc-0.1.0-py3-none-any.whl"
+python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.2.0/ga_tictoc-0.2.0-py3-none-any.whl"
 ```
 
 Install from a local source checkout:
@@ -49,7 +54,7 @@ python -m pip install -e .
 For more flexible date string parsing, install the optional parser support:
 
 ```bash
-python -m pip install "tictoc[dateutil]"
+python -m pip install "ga-tictoc[dateutil]"
 ```
 
 ## Quick Start

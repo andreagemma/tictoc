@@ -1,7 +1,9 @@
-# tictoc Usage Guide
+# ga-tictoc Usage Guide
 
-This guide explains how to use `tictoc` in everyday code and how each public
+This guide explains how to use `ga-tictoc` in everyday code and how each public
 class behaves.
+
+The distribution is installed as `ga-tictoc` and imported as `tictoc`.
 
 Public API:
 
@@ -11,16 +13,19 @@ from tictoc import TicToc, TicTocInterval, TicTocTime, TicTocSpeed
 
 ## Installation
 
-Install from PyPI once the package is published:
+Install or upgrade to the latest stable release from PyPI:
 
 ```bash
-python -m pip install tictoc
+python -m pip install --upgrade ga-tictoc
 ```
+
+Pip selects the latest compatible `py3-none-any` wheel. The same wheel works on
+every Python version supported by the project, currently Python 3.10 or newer.
 
 Install from a GitHub release wheel:
 
 ```bash
-python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.1.0/tictoc-0.1.0-py3-none-any.whl"
+python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.2.0/ga_tictoc-0.2.0-py3-none-any.whl"
 ```
 
 Install from a local checkout:
@@ -32,7 +37,7 @@ python -m pip install -e .
 Install optional flexible date parsing:
 
 ```bash
-python -m pip install "tictoc[dateutil]"
+python -m pip install "ga-tictoc[dateutil]"
 ```
 
 The optional `python-dateutil` dependency is imported lazily. If you only use

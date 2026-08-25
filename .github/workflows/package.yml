@@ -35,6 +35,6 @@ jobs:
       - name: Upload package artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: tictoc-dist
+          name: ga-tictoc-dist
           path: dist/*
           if-no-files-found: error

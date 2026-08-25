@@ -167,5 +167,5 @@ def parse_datetime(value: str, *, fmt: str | None = None) -> datetime:
         except ValueError:
             continue
 
-    parser = import_optional("dateutil.parser", "python -m pip install 'tictoc[dateutil]'")
+    parser = import_optional("dateutil.parser", "python -m pip install 'ga-tictoc[dateutil]'")
     return parser.parse(text)  # type: ignore[attr-defined,no-any-return]
