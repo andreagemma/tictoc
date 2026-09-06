@@ -10,7 +10,8 @@ from datetime import datetime
 from functools import total_ordering
 from math import isfinite
 from numbers import Real
-from typing import Any, Callable, Iterable, Literal
+from typing import Any, Literal
+from collections.abc import Callable, Iterable
 
 from .interval import TicTocInterval
 from .speed import TicTocSpeed
