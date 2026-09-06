@@ -1,0 +1,4 @@
+package	version	license_file	source_url
+build	1.6.0	licenses/third_party/packages/build/LICENSE	https://build.pypa.io/en/stable/changelog.html
+python-dateutil	2.9.0.post0	licenses/third_party/packages/python-dateutil/LICENSE	https://dateutil.readthedocs.io/en/stable/
+twine	7.0.0	licenses/third_party/packages/twine/LICENSE	https://twine.readthedocs.io/

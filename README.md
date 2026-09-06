@@ -42,7 +42,7 @@ python -m pip install --upgrade ga-tictoc
 Install from a GitHub release:
 
 ```bash
-python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.2.0/ga_tictoc-0.2.0-py3-none-any.whl"
+python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.2.1/ga_tictoc-0.2.1-py3-none-any.whl"
 ```
 
 Install from a local source checkout:
@@ -341,3 +341,13 @@ Example output:
 20/20 (100.0%) elapsed=2 s eta=0 s end=2026-06-16 12:00:03 speed=10 steps/s
 finished in 2 s
 ```
+
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE).
+
+Third-party dependency notices and archived license files are available in:
+
+- [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
+- [licenses/third_party/summary.tsv](licenses/third_party/summary.tsv)
+- [licenses/third_party/packages/](licenses/third_party/packages)

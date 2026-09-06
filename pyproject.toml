@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ga-tictoc"
-version = "0.2.0"
+version = "0.2.1"
 description = "Modern timer, interval, timestamp and progress logging utilities."
 readme = "README.md"
 requires-python = ">=3.10"
