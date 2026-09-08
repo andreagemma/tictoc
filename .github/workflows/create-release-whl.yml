@@ -64,11 +64,11 @@ jobs:
               tag = input_version
               source = "workflow input"
           else:
-              version_file = Path("src/tictoc/__init__.py")
+              version_file = Path("src/tictoc/_version.py")
               if not version_file.exists():
                   raise SystemExit(f"Version file not found: {version_file}")
 
-              spec = importlib.util.spec_from_file_location("tictoc", version_file)
+              spec = importlib.util.spec_from_file_location("tictoc._version", version_file)
               if spec is None or spec.loader is None:
                   raise SystemExit("Unable to load version module")
               module = importlib.util.module_from_spec(spec)
@@ -76,7 +76,7 @@ jobs:
               tag = getattr(module, "__version__", "").strip()
               if not tag:
                   raise SystemExit("package __version__ is empty")
-              source = "package __version__"
+              source = "tictoc._version.__version__"
 
           gh_out = os.environ["GITHUB_OUTPUT"]
           with open(gh_out, "a", encoding="utf-8") as f:
