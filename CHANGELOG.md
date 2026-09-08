@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.4 - 2026-09-08
+
+- Restored the PyPI publish workflow file name to `publish-pypi.yml` so PyPI
+  Trusted Publishing matches the configured GitHub workflow again.
+
 ## 0.2.2 - 2026-09-08
 
 - Aligned GitHub Actions workflows with the configreader flow and analogous file names:
