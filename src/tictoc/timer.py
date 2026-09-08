@@ -11,7 +11,7 @@ from datetime import datetime as datetime_dt
 from functools import total_ordering
 from math import isfinite
 from numbers import Real
-from typing import Any, Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from .interval import TicTocInterval
 from .speed import TicTocSpeed
