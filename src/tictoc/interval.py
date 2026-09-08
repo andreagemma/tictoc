@@ -29,36 +29,36 @@ class TicTocInterval:
         self._seconds = _coerce_interval_seconds(value)
 
     @classmethod
-    def from_seconds(cls, seconds: int | float) -> "TicTocInterval":
+    def from_seconds(cls, seconds: int | float) -> TicTocInterval:
         return cls(seconds)
 
     @classmethod
-    def from_minutes(cls, minutes: int | float) -> "TicTocInterval":
+    def from_minutes(cls, minutes: int | float) -> TicTocInterval:
         return cls(float(minutes) * 60.0)
 
     @classmethod
-    def from_hours(cls, hours: int | float) -> "TicTocInterval":
+    def from_hours(cls, hours: int | float) -> TicTocInterval:
         return cls(float(hours) * 3_600.0)
 
     @classmethod
-    def from_days(cls, days: int | float) -> "TicTocInterval":
+    def from_days(cls, days: int | float) -> TicTocInterval:
         return cls(float(days) * 86_400.0)
 
     @classmethod
-    def from_timedelta(cls, value: datetime_timedelta) -> "TicTocInterval":
+    def from_timedelta(cls, value: datetime_timedelta) -> TicTocInterval:
         return cls(value)
 
     @classmethod
-    def from_string(cls, value: str) -> "TicTocInterval":
+    def from_string(cls, value: str) -> TicTocInterval:
         return cls(value)
 
-    def copy(self) -> "TicTocInterval":
+    def copy(self) -> TicTocInterval:
         return type(self)(self._seconds)
 
-    def __copy__(self) -> "TicTocInterval":
+    def __copy__(self) -> TicTocInterval:
         return self.copy()
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> "TicTocInterval":
+    def __deepcopy__(self, memo: dict[int, Any]) -> TicTocInterval:
         return self.copy()
 
     @property
@@ -166,43 +166,43 @@ class TicTocInterval:
     def __hash__(self) -> int:
         return hash(self._seconds)
 
-    def __add__(self, other: object) -> "TicTocInterval | NotImplementedType":
+    def __add__(self, other: object) -> TicTocInterval | NotImplementedType:
         if _can_coerce_interval(other):
             return type(self)(self._seconds + _coerce_interval_seconds(other))
         return NotImplemented
 
-    def __radd__(self, other: object) -> "TicTocInterval":
+    def __radd__(self, other: object) -> TicTocInterval:
         return self.__add__(other)
 
-    def __iadd__(self, other: object) -> "TicTocInterval":
+    def __iadd__(self, other: object) -> TicTocInterval:
         self._seconds += _coerce_interval_seconds(other)
         return self
 
-    def __sub__(self, other: object) -> "TicTocInterval | NotImplementedType":
+    def __sub__(self, other: object) -> TicTocInterval | NotImplementedType:
         if _can_coerce_interval(other):
             return type(self)(self._seconds - _coerce_interval_seconds(other))
         return NotImplemented
 
-    def __rsub__(self, other: object) -> "TicTocInterval | NotImplementedType":
+    def __rsub__(self, other: object) -> TicTocInterval | NotImplementedType:
         if _can_coerce_interval(other):
             return type(self)(_coerce_interval_seconds(other) - self._seconds)
         return NotImplemented
 
-    def __isub__(self, other: object) -> "TicTocInterval":
+    def __isub__(self, other: object) -> TicTocInterval:
         self._seconds -= _coerce_interval_seconds(other)
         return self
 
-    def __mul__(self, other: int | float) -> "TicTocInterval":
+    def __mul__(self, other: int | float) -> TicTocInterval:
         return type(self)(self._seconds * float(other))
 
-    def __rmul__(self, other: int | float) -> "TicTocInterval":
+    def __rmul__(self, other: int | float) -> TicTocInterval:
         return self.__mul__(other)
 
-    def __imul__(self, other: int | float) -> "TicTocInterval":
+    def __imul__(self, other: int | float) -> TicTocInterval:
         self._seconds *= float(other)
         return self
 
-    def __truediv__(self, other: object) -> "TicTocInterval | float | NotImplementedType":
+    def __truediv__(self, other: object) -> TicTocInterval | float | NotImplementedType:
         if isinstance(other, (TicTocInterval, datetime_timedelta)):
             denominator = _coerce_interval_seconds(other)
             return self._seconds / denominator
@@ -210,19 +210,19 @@ class TicTocInterval:
             return type(self)(self._seconds / float(other))
         return NotImplemented
 
-    def __itruediv__(self, other: object) -> "TicTocInterval":
+    def __itruediv__(self, other: object) -> TicTocInterval:
         if not isinstance(other, Real):
             raise TypeError(f"Cannot divide TicTocInterval by {type(other).__name__!r}.")
         self._seconds /= float(other)
         return self
 
-    def __neg__(self) -> "TicTocInterval":
+    def __neg__(self) -> TicTocInterval:
         return type(self)(-self._seconds)
 
-    def __pos__(self) -> "TicTocInterval":
+    def __pos__(self) -> TicTocInterval:
         return self.copy()
 
-    def __abs__(self) -> "TicTocInterval":
+    def __abs__(self) -> TicTocInterval:
         return type(self)(abs(self._seconds))
 
     def __eq__(self, other: object) -> bool:

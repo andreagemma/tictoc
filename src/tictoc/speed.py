@@ -22,7 +22,7 @@ class TicTocSpeed:
 
     def __init__(
         self,
-        value: int | float | "TicTocSpeed" = 0.0,
+        value: int | float | TicTocSpeed = 0.0,
         *,
         steps: int | float | None = None,
         interval: int | float | TicTocInterval | timedelta | None = None,
@@ -61,32 +61,32 @@ class TicTocSpeed:
         cls,
         steps: int | float,
         interval: int | float | TicTocInterval | timedelta,
-    ) -> "TicTocSpeed":
+    ) -> TicTocSpeed:
         return cls(steps=steps, interval=interval)
 
     @classmethod
-    def per_second(cls, value: int | float) -> "TicTocSpeed":
+    def per_second(cls, value: int | float) -> TicTocSpeed:
         return cls(value, per="second")
 
     @classmethod
-    def per_minute(cls, value: int | float) -> "TicTocSpeed":
+    def per_minute(cls, value: int | float) -> TicTocSpeed:
         return cls(value, per="minute")
 
     @classmethod
-    def per_hour(cls, value: int | float) -> "TicTocSpeed":
+    def per_hour(cls, value: int | float) -> TicTocSpeed:
         return cls(value, per="hour")
 
     @classmethod
-    def per_day(cls, value: int | float) -> "TicTocSpeed":
+    def per_day(cls, value: int | float) -> TicTocSpeed:
         return cls(value, per="day")
 
-    def copy(self) -> "TicTocSpeed":
+    def copy(self) -> TicTocSpeed:
         return type(self)(self)
 
-    def __copy__(self) -> "TicTocSpeed":
+    def __copy__(self) -> TicTocSpeed:
         return self.copy()
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> "TicTocSpeed":
+    def __deepcopy__(self, memo: dict[int, Any]) -> TicTocSpeed:
         return self.copy()
 
     @property

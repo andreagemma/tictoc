@@ -49,11 +49,11 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
     counter: float | None
     total: float | None
     _samples: list[_ProgressSample]
-    _named: dict[str, "TicToc"]
+    _named: dict[str, TicToc]
 
     def __init__(
         self,
-        start: int | float | str | datetime_dt | TicTocTime | "TicToc" | None = None,
+        start: int | float | str | datetime_dt | TicTocTime | TicToc | None = None,
         *,
         i: int | float | None = None,
         total: int | float | None = None,
@@ -104,22 +104,22 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
             self._append_sample(self.counter, timestamp)
 
     @classmethod
-    def now(cls, **kwargs: Any) -> "TicToc":
+    def now(cls, **kwargs: Any) -> TicToc:
         return cls(None, **kwargs)
 
     @classmethod
-    def from_timestamp(cls, value: int | float, **kwargs: Any) -> "TicToc":
+    def from_timestamp(cls, value: int | float, **kwargs: Any) -> TicToc:
         return cls(value, **kwargs)
 
     @classmethod
-    def from_datetime(cls, value: datetime_dt, **kwargs: Any) -> "TicToc":
+    def from_datetime(cls, value: datetime_dt, **kwargs: Any) -> TicToc:
         return cls(value, **kwargs)
 
     @classmethod
-    def from_string(cls, value: str, **kwargs: Any) -> "TicToc":
+    def from_string(cls, value: str, **kwargs: Any) -> TicToc:
         return cls(value, **kwargs)
 
-    def copy(self) -> "TicToc":
+    def copy(self) -> TicToc:
         return type(self)(
             self,
             logger=self.logger,
@@ -131,13 +131,13 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
             extra=dict(self.extra or {}),
         )
 
-    def __copy__(self) -> "TicToc":
+    def __copy__(self) -> TicToc:
         return self.copy()
 
-    def __deepcopy__(self, memo: dict[int, Any]) -> "TicToc":
+    def __deepcopy__(self, memo: dict[int, Any]) -> TicToc:
         return self.copy()
 
-    def __getitem__(self, name: str) -> "TicToc":
+    def __getitem__(self, name: str) -> TicToc:
         return self._named[name]
 
     def __contains__(self, name: object) -> bool:
@@ -154,7 +154,7 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
     def to_datetime(self) -> datetime_dt:
         return self.datetime
 
-    def named(self, name: str, *, create: bool = True) -> "TicToc":
+    def named(self, name: str, *, create: bool = True) -> TicToc:
         if name not in self._named:
             if not create:
                 raise KeyError(name)
@@ -179,7 +179,7 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
         total: int | float | None = None,
         tot: int | float | None = None,
         reset_origin: bool = False,
-    ) -> "TicToc":
+    ) -> TicToc:
         """Reset the start instant and return ``self`` for method chaining."""
 
         if name is not None:
@@ -206,7 +206,7 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
         total: int | float | None = None,
         tot: int | float | None = None,
         name: str | None = None,
-    ) -> "TicToc":
+    ) -> TicToc:
         if name is not None:
             self.named(name).update(i=i, total=total, tot=tot)
             return self
@@ -378,26 +378,26 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
     def str_info(self, *args: Any, **kwargs: Any) -> str:
         return self.format_log(*args, **kwargs)
 
-    def debug(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
+    def debug(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
         return self.log(logging.DEBUG, msg, *args, **kwargs)
 
-    def info(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
+    def info(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
         return self.log(logging.INFO, msg, *args, **kwargs)
 
-    def warning(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
+    def warning(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
         return self.log(logging.WARNING, msg, *args, **kwargs)
 
-    def error(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
+    def error(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
-    def critical(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
+    def critical(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
         return self.log(logging.CRITICAL, msg, *args, **kwargs)
 
-    def exception(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
+    def exception(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
         kwargs.setdefault("exc_info", True)
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
-    def log(self, level: int, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
+    def log(self, level: int, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
         each = kwargs.pop("each", None)
         i = kwargs.pop("i", None)
         total = kwargs.pop("total", None)
@@ -522,7 +522,7 @@ class TicToc(logging.LoggerAdapter[logging.Logger]):
             return self._origin_rate(i)
         alpha = 2.0 / (max(n, 1) + 1.0)
         ema: float | None = None
-        for previous, current in zip(samples, samples[1:]):
+        for previous, current in zip(samples, samples[1:], strict=False):
             rate = _rate_between(previous, current, fallback=0.0)
             if rate <= 0:
                 continue
