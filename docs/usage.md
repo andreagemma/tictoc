@@ -476,8 +476,8 @@ TicTocInterval("500us")
 Clock-like formats:
 
 ```python
-TicTocInterval("10:30")       # 10 minutes, 30 seconds
-TicTocInterval("01:02:03")    # 1 hour, 2 minutes, 3 seconds
+TicTocInterval("10:30")  # 10 minutes, 30 seconds
+TicTocInterval("01:02:03")  # 1 hour, 2 minutes, 3 seconds
 TicTocInterval("1.02:00:53")  # 1 day, 2 hours, 53 seconds
 ```
 
@@ -554,8 +554,8 @@ a /= 4
 ```python
 interval = TicTocInterval("90s")
 
-float(interval)       # 90.0
-int(interval)         # 90
+float(interval)  # 90.0
+int(interval)  # 90
 interval.to_timedelta()
 interval.timedelta
 interval.humanize()
@@ -566,9 +566,9 @@ repr(interval)
 Formatting:
 
 ```python
-format(interval, ".2f")       # numeric seconds
-format(interval, "td")        # timedelta string
-format(interval, "human")     # same as str(interval)
+format(interval, ".2f")  # numeric seconds
+format(interval, "td")  # timedelta string
+format(interval, "human")  # same as str(interval)
 ```
 
 ### Comparison and Copying
@@ -694,7 +694,7 @@ Subtract a `datetime` from a `TicTocTime`, or the other way around, to get a
 ```python
 instant = TicTocTime.now()
 
-float(instant)         # Unix timestamp
+float(instant)  # Unix timestamp
 int(instant)
 instant.to_datetime()
 instant.to_string()
@@ -788,11 +788,11 @@ repr(speed)
 Formatting:
 
 ```python
-format(speed, "s")      # steps per second
-format(speed, "m")      # steps per minute
-format(speed, "h")      # steps per hour
-format(speed, "d")      # steps per day
-format(speed, ".2f")    # numeric steps per second
+format(speed, "s")  # steps per second
+format(speed, "m")  # steps per minute
+format(speed, "h")  # steps per hour
+format(speed, "d")  # steps per day
+format(speed, ".2f")  # numeric steps per second
 ```
 
 ### Comparison and Copying
@@ -810,13 +810,13 @@ Comparisons accept numbers and other `TicTocSpeed` values.
 All public classes provide human-readable string output:
 
 ```python
-str(TicTocInterval(0.152368))     # 0.152 s
-str(TicTocInterval(53.152368))    # 53.2 s
-str(TicTocInterval(653.152368))   # 00:10:53
-str(TicTocInterval(93_653))       # 1.02:00:53
+str(TicTocInterval(0.152368))  # 0.152 s
+str(TicTocInterval(53.152368))  # 53.2 s
+str(TicTocInterval(653.152368))  # 00:10:53
+str(TicTocInterval(93_653))  # 1.02:00:53
 
-str(TicTocTime.now())             # 2026-06-16 12:00:00
-str(TicTocSpeed.per_hour(3600))   # 1 step/s
+str(TicTocTime.now())  # 2026-06-16 12:00:00
+str(TicTocSpeed.per_hour(3600))  # 1 step/s
 ```
 
 Use numeric properties when exact machine-readable values are needed.
@@ -827,6 +827,7 @@ Use numeric properties when exact machine-readable values are needed.
 
 ```python
 from tictoc import TicToc
+
 
 def load_data() -> list[int]:
     tt = TicToc()

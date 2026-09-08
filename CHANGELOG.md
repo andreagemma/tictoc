@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.2 - 2026-09-08
+
+- Aligned GitHub Actions workflows with the configreader flow and analogous file names:
+  - `all.yml`
+  - `ci.yml`
+  - `fast_ci.yml`
+  - `quality.yml`
+  - `create-release.yml`
+  - `create-release-whl.yml`
+  - `release.yml`
+- Removed legacy non-analog workflow files (`package.yml`, `publish-pypi.yml`).
+- Bumped package/build version from `0.2.1` to `0.2.2`.
+
 ## 0.2.1 - 2026-09-06
 
 - Added third-party compliance artifacts derived from dependencies declared in `pyproject.toml`:

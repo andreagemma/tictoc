@@ -69,7 +69,7 @@ tt = TicToc()
 # Work...
 
 elapsed = tt.toc()
-print(elapsed)          # Human-readable value
+print(elapsed)  # Human-readable value
 print(elapsed.seconds)  # Total seconds
 ```
 
@@ -251,7 +251,7 @@ c = TicTocInterval(10)  # Seconds
 
 print(a + b)
 print(c * 3)
-print(float(a))         # Total seconds
+print(float(a))  # Total seconds
 print(a.total_hours)
 print(a.component_days)
 ```
@@ -281,7 +281,7 @@ later = start + timedelta(minutes=10)
 print(now)
 print(later - start)  # TicTocInterval
 print(start.year, start.month, start.day)
-print(float(start))   # Unix timestamp
+print(float(start))  # Unix timestamp
 ```
 
 You can create a `TicTocTime` from:
@@ -303,7 +303,7 @@ from tictoc import TicTocSpeed, TicTocInterval
 
 speed = TicTocSpeed.from_steps(120, TicTocInterval.from_minutes(2))
 
-print(speed)                  # 1 step/s
+print(speed)  # 1 step/s
 print(speed.steps_per_second)
 print(speed.steps_per_minute)
 print(speed.steps_per_hour)

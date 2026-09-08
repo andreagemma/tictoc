@@ -5,19 +5,21 @@ from __future__ import annotations
 import logging
 import string
 import time as _time
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime as datetime_dt
 from functools import total_ordering
 from math import isfinite
 from numbers import Real
 from typing import Any, Literal
-from collections.abc import Callable, Iterable
 
 from .interval import TicTocInterval
 from .speed import TicTocSpeed
 from .time import TicTocTime
 
-EstimationMethod = Literal["origin", "average", "tic", "last", "instant", "moving", "rolling", "ema"]
+EstimationMethod = Literal[
+    "origin", "average", "tic", "last", "instant", "moving", "rolling", "ema"
+]
 Clock = Callable[[], float]
 
 _DEFAULT_FORMAT = "elapsed={et}"
@@ -33,7 +35,7 @@ class _ProgressSample:
 
 
 @total_ordering
-class TicToc(logging.LoggerAdapter):
+class TicToc(logging.LoggerAdapter[logging.Logger]):
     """Timer, progress estimator and logging adapter.
 
     ``tic`` resets the timer and returns ``self`` for method chaining. Named
@@ -42,10 +44,16 @@ class TicToc(logging.LoggerAdapter):
     """
 
     default_datetime_format = "%Y-%m-%d %H:%M:%S"
+    _origin: TicTocTime
+    _start: TicTocTime
+    counter: float | None
+    total: float | None
+    _samples: list[_ProgressSample]
+    _named: dict[str, "TicToc"]
 
     def __init__(
         self,
-        start: int | float | str | datetime | TicTocTime | "TicToc" | None = None,
+        start: int | float | str | datetime_dt | TicTocTime | "TicToc" | None = None,
         *,
         i: int | float | None = None,
         total: int | float | None = None,
@@ -72,20 +80,26 @@ class TicToc(logging.LoggerAdapter):
             self._origin = start._origin.copy()
             self._start = start._start.copy()
             self.counter = start.counter if i is None else float(i)
-            self.total = start.total if total is None and tot is None else _coerce_optional_float(total, tot)
+            self.total = (
+                start.total if total is None and tot is None else _coerce_optional_float(total, tot)
+            )
             self._samples = list(start._samples)
             self._named = {key: value.copy() for key, value in start._named.items()}
             if logger is None:
                 self.logger = start.logger
             return
 
-        timestamp = self._clock() if start is None else TicTocTime(start, fmt=self.datetime_format).timestamp
+        timestamp = (
+            self._clock()
+            if start is None
+            else TicTocTime(start, fmt=self.datetime_format).timestamp
+        )
         self._origin = TicTocTime(timestamp, fmt=self.datetime_format)
         self._start = TicTocTime(timestamp, fmt=self.datetime_format)
         self.counter = None if i is None else float(i)
         self.total = _coerce_optional_float(total, tot)
-        self._samples: list[_ProgressSample] = []
-        self._named: dict[str, TicToc] = {}
+        self._samples = []
+        self._named = {}
         if self.counter is not None:
             self._append_sample(self.counter, timestamp)
 
@@ -98,7 +112,7 @@ class TicToc(logging.LoggerAdapter):
         return cls(value, **kwargs)
 
     @classmethod
-    def from_datetime(cls, value: datetime, **kwargs: Any) -> "TicToc":
+    def from_datetime(cls, value: datetime_dt, **kwargs: Any) -> "TicToc":
         return cls(value, **kwargs)
 
     @classmethod
@@ -114,7 +128,7 @@ class TicToc(logging.LoggerAdapter):
             total_format=self.total_format,
             datetime_format=self.datetime_format,
             clock=self._clock,
-            extra=dict(self.extra),
+            extra=dict(self.extra or {}),
         )
 
     def __copy__(self) -> "TicToc":
@@ -134,10 +148,10 @@ class TicToc(logging.LoggerAdapter):
         return tuple(self._named.keys())
 
     @property
-    def datetime(self) -> datetime:
+    def datetime(self) -> datetime_dt:
         return self.start_time().datetime
 
-    def to_datetime(self) -> datetime:
+    def to_datetime(self) -> datetime_dt:
         return self.datetime
 
     def named(self, name: str, *, create: bool = True) -> "TicToc":
@@ -153,7 +167,7 @@ class TicToc(logging.LoggerAdapter):
                 total_format=self.total_format,
                 datetime_format=self.datetime_format,
                 clock=self._clock,
-                extra=dict(self.extra),
+                extra=dict(self.extra or {}),
             )
         return self._named[name]
 
@@ -256,7 +270,9 @@ class TicToc(logging.LoggerAdapter):
         name: str | None = None,
     ) -> TicTocInterval:
         if name is not None:
-            return self.named(name, create=False).remaining_time(i=i, total=total, tot=tot, method=method, n=n)
+            return self.named(name, create=False).remaining_time(
+                i=i, total=total, tot=tot, method=method, n=n
+            )
 
         resolved_i = self._resolve_counter(i)
         resolved_total = self._resolve_total(total, tot)
@@ -280,8 +296,12 @@ class TicToc(logging.LoggerAdapter):
         name: str | None = None,
     ) -> TicTocInterval:
         if name is not None:
-            return self.named(name, create=False).total_time(i=i, total=total, tot=tot, method=method, n=n)
-        return self.elapsed_time() + self.remaining_time(i=i, total=total, tot=tot, method=method, n=n)
+            return self.named(name, create=False).total_time(
+                i=i, total=total, tot=tot, method=method, n=n
+            )
+        return self.elapsed_time() + self.remaining_time(
+            i=i, total=total, tot=tot, method=method, n=n
+        )
 
     def end_time(
         self,
@@ -294,7 +314,9 @@ class TicToc(logging.LoggerAdapter):
         name: str | None = None,
     ) -> TicTocTime:
         if name is not None:
-            return self.named(name, create=False).end_time(i=i, total=total, tot=tot, method=method, n=n)
+            return self.named(name, create=False).end_time(
+                i=i, total=total, tot=tot, method=method, n=n
+            )
         return TicTocTime(self._clock(), fmt=self.datetime_format) + self.remaining_time(
             i=i,
             total=total,
@@ -356,26 +378,26 @@ class TicToc(logging.LoggerAdapter):
     def str_info(self, *args: Any, **kwargs: Any) -> str:
         return self.format_log(*args, **kwargs)
 
-    def debug(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":
+    def debug(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
         return self.log(logging.DEBUG, msg, *args, **kwargs)
 
-    def info(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":
+    def info(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
         return self.log(logging.INFO, msg, *args, **kwargs)
 
-    def warning(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":
+    def warning(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
         return self.log(logging.WARNING, msg, *args, **kwargs)
 
-    def error(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":
+    def error(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
-    def critical(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":
+    def critical(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
         return self.log(logging.CRITICAL, msg, *args, **kwargs)
 
-    def exception(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":
+    def exception(self, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
         kwargs.setdefault("exc_info", True)
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
-    def log(self, level: int, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":
+    def log(self, level: int, msg: str | None = None, *args: Any, **kwargs: Any) -> "TicToc":  # type: ignore[override]
         each = kwargs.pop("each", None)
         i = kwargs.pop("i", None)
         total = kwargs.pop("total", None)
@@ -386,7 +408,11 @@ class TicToc(logging.LoggerAdapter):
         datetime_format = kwargs.pop("datetime_format", None)
 
         log_kwargs, format_values = _split_log_kwargs(kwargs)
-        resolved_i = i if i is not None else (self.named(name, create=False).counter if name is not None else self.counter)
+        resolved_i = (
+            i
+            if i is not None
+            else (self.named(name, create=False).counter if name is not None else self.counter)
+        )
         if not _should_log(each, resolved_i):
             return self
 
@@ -440,7 +466,7 @@ class TicToc(logging.LoggerAdapter):
         try:
             return float(self) < _coerce_compare_timestamp(other)
         except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+            return NotImplemented
 
     def _append_sample(self, counter: float, timestamp: float) -> None:
         if self._samples and self._samples[-1].counter == counter:
@@ -629,14 +655,16 @@ def _coerce_compare_timestamp(value: object) -> float:
         return float(value)
     if isinstance(value, TicTocTime):
         return value.timestamp
-    if isinstance(value, datetime):
+    if isinstance(value, datetime_dt):
         return value.timestamp()
     if isinstance(value, Real):
         return float(value)
     raise TypeError(f"Cannot compare TicToc with {type(value).__name__!r}.")
 
 
-def _normalize_method(method: EstimationMethod) -> Literal["origin", "last", "moving", "ema"]:
+def _normalize_method(
+    method: EstimationMethod,
+) -> Literal["origin", "last", "moving", "ema"]:
     aliases: dict[str, Literal["origin", "last", "moving", "ema"]] = {
         "origin": "origin",
         "average": "origin",
@@ -653,7 +681,9 @@ def _normalize_method(method: EstimationMethod) -> Literal["origin", "last", "mo
         raise ValueError(f"Unsupported estimation method: {method!r}.") from exc
 
 
-def _different_counter_tail(samples: Iterable[_ProgressSample]) -> list[_ProgressSample]:
+def _different_counter_tail(
+    samples: Iterable[_ProgressSample],
+) -> list[_ProgressSample]:
     filtered: list[_ProgressSample] = []
     for sample in samples:
         if filtered and filtered[-1].counter == sample.counter:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from typing import Final
+from typing import Final, cast
 
 from ._optional import import_optional
 
@@ -138,7 +138,12 @@ def _parse_iso_duration(text: str) -> float | None:
     if match is None:
         return None
     total = 0.0
-    for name, multiplier in (("days", 86_400), ("hours", 3_600), ("minutes", 60), ("seconds", 1)):
+    for name, multiplier in (
+        ("days", 86_400),
+        ("hours", 3_600),
+        ("minutes", 60),
+        ("seconds", 1),
+    ):
         raw = match.group(name)
         if raw is not None:
             total += float(raw) * multiplier
@@ -168,4 +173,4 @@ def parse_datetime(value: str, *, fmt: str | None = None) -> datetime:
             continue
 
     parser = import_optional("dateutil.parser", "python -m pip install 'ga-tictoc[dateutil]'")
-    return parser.parse(text)  # type: ignore[attr-defined,no-any-return]
+    return cast(datetime, parser.parse(text))

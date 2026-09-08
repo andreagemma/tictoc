@@ -4,18 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ga-tictoc"
-version = "0.2.1"
+dynamic = ["version"]
 description = "Modern timer, interval, timestamp and progress logging utilities."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{ name = "ga-tictoc contributors" }]
+authors = [{ name = "Andrea Gemma", email = "andrea.gemma@gmail.com" }]
 keywords = ["timer", "time", "progress", "logging", "eta"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -23,13 +23,22 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Logging",
+    "Typing :: Typed",
 ]
 dependencies = []
 
 [project.optional-dependencies]
 dateutil = ["python-dateutil>=2.8"]
 build = ["build>=1", "twine>=5"]
-test = ["python-dateutil>=2.8"]
+test = ["python-dateutil>=2.8","pytest>=8.0", "pytest-cov>=5.0"]
+dev = [
+  "build>=1.2",
+  "mypy>=1.10",
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.5",
+  "twine>=5.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/andreagemma/tictoc"
@@ -37,11 +46,35 @@ Documentation = "https://github.com/andreagemma/tictoc/blob/main/docs/usage.md"
 Repository = "https://github.com/andreagemma/tictoc"
 Issues = "https://github.com/andreagemma/tictoc/issues"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 tictoc = ["py.typed"]
 
-[tool.unittest]
-start-directory = "tests"
+[tool.setuptools.dynamic]
+version = {attr = "tictoc._version.__version__"}
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["tictoc"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src"]
+

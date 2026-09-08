@@ -44,7 +44,12 @@ class TicTocSpeed:
             self._interval = interval_obj
             return
 
-        multiplier = {"second": 1.0, "minute": 1.0 / 60.0, "hour": 1.0 / 3_600.0, "day": 1.0 / 86_400.0}
+        multiplier = {
+            "second": 1.0,
+            "minute": 1.0 / 60.0,
+            "hour": 1.0 / 3_600.0,
+            "day": 1.0 / 86_400.0,
+        }
         if per not in multiplier:
             raise ValueError(f"Unsupported speed unit: {per!r}.")
         self._steps_per_second = float(value) * multiplier[per]
@@ -190,10 +195,9 @@ class TicTocSpeed:
             return False
 
     def __lt__(self, other: object) -> bool:
-        try:
+        if _can_coerce_speed(other):
             return self._steps_per_second < _coerce_speed_value(other)
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+        return NotImplemented
 
 
 def _coerce_speed_value(value: object) -> float:
@@ -202,6 +206,10 @@ def _coerce_speed_value(value: object) -> float:
     if isinstance(value, Real):
         return float(value)
     raise TypeError(f"Cannot convert {type(value).__name__!r} to TicTocSpeed.")
+
+
+def _can_coerce_speed(value: object) -> bool:
+    return isinstance(value, (TicTocSpeed, Real))
 
 
 def _best_speed_unit(per_second: float) -> tuple[float, str]:

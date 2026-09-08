@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime, time as datetime_time, timedelta
+from datetime import (
+    date as datetime_date,
+    datetime as datetime_dt,
+    time as datetime_time,
+    timedelta as datetime_timedelta,
+)
 from functools import total_ordering
 from numbers import Real
+from types import NotImplementedType
 from typing import Any, TypeAlias
 
 from ._parse import parse_datetime
 from .interval import TicTocInterval
 
-TimeInput: TypeAlias = "int | float | str | datetime | TicTocTime | None"
+TimeInput: TypeAlias = "int | float | str | datetime_dt | TicTocTime | None"
 
 
 @total_ordering
@@ -27,14 +33,14 @@ class TicTocTime:
 
     @classmethod
     def now(cls, *, fmt: str | None = None) -> "TicTocTime":
-        return cls(datetime.now().timestamp(), fmt=fmt)
+        return cls(datetime_dt.now().timestamp(), fmt=fmt)
 
     @classmethod
     def from_timestamp(cls, value: int | float, *, fmt: str | None = None) -> "TicTocTime":
         return cls(value, fmt=fmt)
 
     @classmethod
-    def from_datetime(cls, value: datetime, *, fmt: str | None = None) -> "TicTocTime":
+    def from_datetime(cls, value: datetime_dt, *, fmt: str | None = None) -> "TicTocTime":
         return cls(value, fmt=fmt)
 
     @classmethod
@@ -59,11 +65,11 @@ class TicTocTime:
         return self._timestamp
 
     @property
-    def datetime(self) -> datetime:
+    def datetime(self) -> datetime_dt:
         return self.to_datetime()
 
     @property
-    def date(self) -> date:
+    def date(self) -> datetime_date:
         return self.datetime.date()
 
     @property
@@ -102,8 +108,8 @@ class TicTocTime:
     def weekday(self) -> int:
         return self.datetime.weekday()
 
-    def to_datetime(self) -> datetime:
-        return datetime.fromtimestamp(self._timestamp)
+    def to_datetime(self) -> datetime_dt:
+        return datetime_dt.fromtimestamp(self._timestamp)
 
     def to_string(self, fmt: str | None = None) -> str:
         return self.to_datetime().strftime(fmt or self._format)
@@ -141,11 +147,13 @@ class TicTocTime:
     def __hash__(self) -> int:
         return hash(self._timestamp)
 
-    def __add__(self, other: object) -> "TicTocTime":
-        try:
-            return type(self)(self._timestamp + _coerce_interval_for_time_math(other), fmt=self._format)
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+    def __add__(self, other: object) -> "TicTocTime | NotImplementedType":
+        if _can_coerce_interval_for_time_math(other):
+            return type(self)(
+                self._timestamp + _coerce_interval_for_time_math(other),
+                fmt=self._format,
+            )
+        return NotImplemented
 
     def __radd__(self, other: object) -> "TicTocTime":
         return self.__add__(other)
@@ -154,18 +162,20 @@ class TicTocTime:
         self._timestamp += _coerce_interval_for_time_math(other)
         return self
 
-    def __sub__(self, other: object) -> "TicTocInterval | TicTocTime":
-        if isinstance(other, (TicTocTime, datetime)):
+    def __sub__(self, other: object) -> "TicTocInterval | TicTocTime | NotImplementedType":
+        if isinstance(other, (TicTocTime, datetime_dt)):
             return TicTocInterval(self._timestamp - _coerce_timestamp(other))
-        try:
-            return type(self)(self._timestamp - _coerce_interval_for_time_math(other), fmt=self._format)
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+        if _can_coerce_interval_for_time_math(other):
+            return type(self)(
+                self._timestamp - _coerce_interval_for_time_math(other),
+                fmt=self._format,
+            )
+        return NotImplemented
 
-    def __rsub__(self, other: object) -> "TicTocInterval":
-        if isinstance(other, (TicTocTime, datetime)):
+    def __rsub__(self, other: object) -> "TicTocInterval | NotImplementedType":
+        if isinstance(other, (TicTocTime, datetime_dt)):
             return TicTocInterval(_coerce_timestamp(other) - self._timestamp)
-        return NotImplemented  # type: ignore[return-value]
+        return NotImplemented
 
     def __isub__(self, other: object) -> "TicTocTime":
         self._timestamp -= _coerce_interval_for_time_math(other)
@@ -178,18 +188,17 @@ class TicTocTime:
             return False
 
     def __lt__(self, other: object) -> bool:
-        try:
+        if _can_coerce_timestamp(other):
             return self._timestamp < _coerce_timestamp(other)
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+        return NotImplemented
 
 
 def _coerce_timestamp(value: object, *, fmt: str | None = None) -> float:
     if value is None:
-        return datetime.now().timestamp()
+        return datetime_dt.now().timestamp()
     if isinstance(value, TicTocTime):
         return value.timestamp
-    if isinstance(value, datetime):
+    if isinstance(value, datetime_dt):
         return value.timestamp()
     if isinstance(value, Real):
         return float(value)
@@ -201,8 +210,16 @@ def _coerce_timestamp(value: object, *, fmt: str | None = None) -> float:
 def _coerce_interval_for_time_math(value: object) -> float:
     if isinstance(value, TicTocInterval):
         return value.seconds
-    if isinstance(value, timedelta):
+    if isinstance(value, datetime_timedelta):
         return value.total_seconds()
     if isinstance(value, Real):
         return float(value)
     raise TypeError(f"Cannot use {type(value).__name__!r} as a time interval.")
+
+
+def _can_coerce_timestamp(value: object) -> bool:
+    return value is None or isinstance(value, (TicTocTime, datetime_dt, Real, str))
+
+
+def _can_coerce_interval_for_time_math(value: object) -> bool:
+    return isinstance(value, (TicTocInterval, datetime_timedelta, Real))

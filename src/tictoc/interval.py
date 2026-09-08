@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import timedelta as datetime_timedelta
 from functools import total_ordering
 from numbers import Real
+from types import NotImplementedType
 from typing import Any, TypeAlias
 
 from ._human import humanize_seconds
 from ._parse import parse_interval_seconds
 
-IntervalInput: TypeAlias = "int | float | str | timedelta | TicTocInterval | None"
+IntervalInput: TypeAlias = "int | float | str | datetime_timedelta | TicTocInterval | None"
 
 
 @total_ordering
@@ -44,7 +45,7 @@ class TicTocInterval:
         return cls(float(days) * 86_400.0)
 
     @classmethod
-    def from_timedelta(cls, value: timedelta) -> "TicTocInterval":
+    def from_timedelta(cls, value: datetime_timedelta) -> "TicTocInterval":
         return cls(value)
 
     @classmethod
@@ -131,11 +132,11 @@ class TicTocInterval:
         return _split_components(self._seconds)[4]
 
     @property
-    def timedelta(self) -> timedelta:
+    def timedelta(self) -> datetime_timedelta:
         return self.to_timedelta()
 
-    def to_timedelta(self) -> timedelta:
-        return timedelta(seconds=self._seconds)
+    def to_timedelta(self) -> datetime_timedelta:
+        return datetime_timedelta(seconds=self._seconds)
 
     def humanize(self) -> str:
         return humanize_seconds(self._seconds)
@@ -165,11 +166,10 @@ class TicTocInterval:
     def __hash__(self) -> int:
         return hash(self._seconds)
 
-    def __add__(self, other: object) -> "TicTocInterval":
-        try:
+    def __add__(self, other: object) -> "TicTocInterval | NotImplementedType":
+        if _can_coerce_interval(other):
             return type(self)(self._seconds + _coerce_interval_seconds(other))
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+        return NotImplemented
 
     def __radd__(self, other: object) -> "TicTocInterval":
         return self.__add__(other)
@@ -178,17 +178,15 @@ class TicTocInterval:
         self._seconds += _coerce_interval_seconds(other)
         return self
 
-    def __sub__(self, other: object) -> "TicTocInterval":
-        try:
+    def __sub__(self, other: object) -> "TicTocInterval | NotImplementedType":
+        if _can_coerce_interval(other):
             return type(self)(self._seconds - _coerce_interval_seconds(other))
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+        return NotImplemented
 
-    def __rsub__(self, other: object) -> "TicTocInterval":
-        try:
+    def __rsub__(self, other: object) -> "TicTocInterval | NotImplementedType":
+        if _can_coerce_interval(other):
             return type(self)(_coerce_interval_seconds(other) - self._seconds)
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+        return NotImplemented
 
     def __isub__(self, other: object) -> "TicTocInterval":
         self._seconds -= _coerce_interval_seconds(other)
@@ -204,15 +202,17 @@ class TicTocInterval:
         self._seconds *= float(other)
         return self
 
-    def __truediv__(self, other: object) -> "TicTocInterval | float":
-        if isinstance(other, (TicTocInterval, timedelta)):
+    def __truediv__(self, other: object) -> "TicTocInterval | float | NotImplementedType":
+        if isinstance(other, (TicTocInterval, datetime_timedelta)):
             denominator = _coerce_interval_seconds(other)
             return self._seconds / denominator
         if isinstance(other, Real):
             return type(self)(self._seconds / float(other))
         return NotImplemented
 
-    def __itruediv__(self, other: int | float) -> "TicTocInterval":
+    def __itruediv__(self, other: object) -> "TicTocInterval":
+        if not isinstance(other, Real):
+            raise TypeError(f"Cannot divide TicTocInterval by {type(other).__name__!r}.")
         self._seconds /= float(other)
         return self
 
@@ -232,10 +232,9 @@ class TicTocInterval:
             return False
 
     def __lt__(self, other: object) -> bool:
-        try:
+        if _can_coerce_interval(other):
             return self._seconds < _coerce_interval_seconds(other)
-        except TypeError:
-            return NotImplemented  # type: ignore[return-value]
+        return NotImplemented
 
 
 def _coerce_interval_seconds(value: object) -> float:
@@ -243,7 +242,7 @@ def _coerce_interval_seconds(value: object) -> float:
         return 0.0
     if isinstance(value, TicTocInterval):
         return value.seconds
-    if isinstance(value, timedelta):
+    if isinstance(value, datetime_timedelta):
         return value.total_seconds()
     if isinstance(value, Real):
         return float(value)
@@ -253,9 +252,13 @@ def _coerce_interval_seconds(value: object) -> float:
 
 
 def _split_components(seconds: float) -> tuple[int, int, int, int, int]:
-    delta = timedelta(seconds=abs(seconds))
+    delta = datetime_timedelta(seconds=abs(seconds))
     days = delta.days
     whole_seconds = delta.seconds
     hours, whole_seconds = divmod(whole_seconds, 3_600)
     minutes, whole_seconds = divmod(whole_seconds, 60)
     return days, hours, minutes, whole_seconds, delta.microseconds
+
+
+def _can_coerce_interval(value: object) -> bool:
+    return value is None or isinstance(value, (TicTocInterval, datetime_timedelta, Real, str))
