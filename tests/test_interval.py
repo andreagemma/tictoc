@@ -23,7 +23,7 @@ class TestTicTocInterval:
         assert (interval - timedelta(seconds=4)).seconds == 6
         assert (20 - interval).seconds == 10
         assert (interval * 3).seconds == 30
-        assert (interval / 2).seconds == 5
+        assert (interval / 2).seconds == 5  # type: ignore
         assert interval / TicTocInterval(5) == 2
         assert interval > 5
         assert interval >= timedelta(seconds=10)

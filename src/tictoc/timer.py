@@ -11,11 +11,16 @@ from datetime import datetime as datetime_dt
 from functools import total_ordering
 from math import isfinite
 from numbers import Real
-from typing import Any, Literal
+from typing import Any, Literal, TYPE_CHECKING
 
 from .interval import TicTocInterval
 from .speed import TicTocSpeed
 from .time import TicTocTime
+
+if TYPE_CHECKING:
+    _LoggerAdapterBase = logging.LoggerAdapter[logging.Logger]
+else:
+    _LoggerAdapterBase = logging.LoggerAdapter
 
 EstimationMethod = Literal[
     "origin", "average", "tic", "last", "instant", "moving", "rolling", "ema"
@@ -35,7 +40,7 @@ class _ProgressSample:
 
 
 @total_ordering
-class TicToc(logging.LoggerAdapter[logging.Logger]):
+class TicToc(_LoggerAdapterBase):
     """Timer, progress estimator and logging adapter.
 
     ``tic`` resets the timer and returns ``self`` for method chaining. Named

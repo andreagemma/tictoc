@@ -26,7 +26,7 @@ class TicTocInterval:
     __slots__ = ("_seconds",)
 
     def __init__(self, value: IntervalInput = 0.0) -> None:
-        self._seconds = _coerce_interval_seconds(value)
+        self._seconds: float = _coerce_interval_seconds(value)
 
     @classmethod
     def from_seconds(cls, seconds: int | float) -> TicTocInterval:

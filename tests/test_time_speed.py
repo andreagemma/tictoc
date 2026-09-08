@@ -24,9 +24,9 @@ class TestTicTocTime:
         instant = TicTocTime.from_string("2024-01-02 03:04:05")
         later = instant + TicTocInterval(10)
         assert isinstance(later, TicTocTime)
-        assert (later - instant).seconds == 10
-        assert (later - datetime.fromtimestamp(float(instant))).seconds == 10
-        assert ((later - timedelta(seconds=5)) - instant).seconds == 5
+        assert (later - instant).seconds == 10  # type: ignore
+        assert (later - datetime.fromtimestamp(float(instant))).seconds == 10  # type: ignore
+        assert ((later - timedelta(seconds=5)) - instant).seconds == 5  # type: ignore
         assert later > instant
 
 
