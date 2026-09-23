@@ -1,0 +1,64 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.hypothesis/
+
+# Virtual environments - never commit these
+.venv/
+venv/
+env/
+ENV/
+.env/
+.envrc
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Packaging and build artifacts
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+*.whl
+*.tar.gz
+pip-wheel-metadata/
+
+# Test and coverage output
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Local installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Type checker local state
+.dmypy.json
+dmypy.json
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+quality_test.sh
+*.code-workspace
+.github/copilot-instructions.md
