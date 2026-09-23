@@ -28,6 +28,15 @@ class TicTocSpeed:
         interval: int | float | TicTocInterval | timedelta | None = None,
         per: SpeedUnit = "second",
     ) -> None:
+        """Implement `__init__`.
+
+        Args:
+            value: TODO describe value.
+            steps: TODO describe steps.
+            interval: TODO describe interval.
+            per: TODO describe per.
+
+        """
         if isinstance(value, TicTocSpeed):
             self._steps_per_second = value.steps_per_second
             self._steps = value.steps
@@ -62,86 +71,240 @@ class TicTocSpeed:
         steps: int | float,
         interval: int | float | TicTocInterval | timedelta,
     ) -> TicTocSpeed:
+        """From steps.
+
+        Args:
+            steps: TODO describe steps.
+            interval: TODO describe interval.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(steps=steps, interval=interval)
 
     @classmethod
     def per_second(cls, value: int | float) -> TicTocSpeed:
+        """Per second.
+
+        Args:
+            value: TODO describe value.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(value, per="second")
 
     @classmethod
     def per_minute(cls, value: int | float) -> TicTocSpeed:
+        """Per minute.
+
+        Args:
+            value: TODO describe value.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(value, per="minute")
 
     @classmethod
     def per_hour(cls, value: int | float) -> TicTocSpeed:
+        """Per hour.
+
+        Args:
+            value: TODO describe value.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(value, per="hour")
 
     @classmethod
     def per_day(cls, value: int | float) -> TicTocSpeed:
+        """Per day.
+
+        Args:
+            value: TODO describe value.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(value, per="day")
 
     def copy(self) -> TicTocSpeed:
+        """Copy.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return type(self)(self)
 
     def __copy__(self) -> TicTocSpeed:
+        """Implement `__copy__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.copy()
 
     def __deepcopy__(self, memo: dict[int, Any]) -> TicTocSpeed:
+        """Implement `__deepcopy__`.
+
+        Args:
+            memo: TODO describe memo.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.copy()
 
     @property
     def steps_per_second(self) -> float:
+        """Steps per second.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._steps_per_second
 
     @property
     def per_sec(self) -> float:
+        """Per sec.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._steps_per_second
 
     @property
     def at_seconds(self) -> float:
+        """At seconds.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._steps_per_second
 
     @property
     def steps_per_minute(self) -> float:
+        """Steps per minute.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._steps_per_second * 60.0
 
     @property
     def per_min(self) -> float:
+        """Per min.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.steps_per_minute
 
     @property
     def at_minutes(self) -> float:
+        """At minutes.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.steps_per_minute
 
     @property
     def steps_per_hour(self) -> float:
+        """Steps per hour.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._steps_per_second * 3_600.0
 
     @property
     def per_hour_value(self) -> float:
+        """Per hour value.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.steps_per_hour
 
     @property
     def at_hours(self) -> float:
+        """At hours.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.steps_per_hour
 
     @property
     def steps_per_day(self) -> float:
+        """Steps per day.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._steps_per_second * 86_400.0
 
     @property
     def at_days(self) -> float:
+        """At days.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.steps_per_day
 
     @property
     def steps(self) -> float:
+        """Steps.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._steps
 
     @property
     def interval(self) -> TicTocInterval:
+        """Interval.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._interval.copy()
 
     def in_unit(self, unit: SpeedUnit) -> float:
+        """In unit.
+
+        Args:
+            unit: TODO describe unit.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if unit == "second":
             return self.steps_per_second
         if unit == "minute":
@@ -153,26 +316,74 @@ class TicTocSpeed:
         raise ValueError(f"Unsupported speed unit: {unit!r}.")
 
     def humanize(self, *, label: str = "step") -> str:
+        """Humanize.
+
+        Args:
+            label: TODO describe label.
+
+        Returns:
+            TODO describe return value.
+
+        """
         value, suffix = _best_speed_unit(self._steps_per_second)
         plural_label = label if abs(value) == 1 else f"{label}s"
         return f"{compact_number(value)} {plural_label}/{suffix}"
 
     def __int__(self) -> int:
+        """Implement `__int__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return int(self._steps_per_second)
 
     def __float__(self) -> float:
+        """Implement `__float__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return float(self._steps_per_second)
 
     def __bool__(self) -> bool:
+        """Implement `__bool__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return bool(self._steps_per_second)
 
     def __str__(self) -> str:
+        """Implement `__str__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.humanize()
 
     def __repr__(self) -> str:
+        """Implement `__repr__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return f"TicTocSpeed({self._steps_per_second!r})"
 
     def __format__(self, format_spec: str) -> str:
+        """Implement `__format__`.
+
+        Args:
+            format_spec: TODO describe format_spec.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if format_spec in ("", "human"):
             return str(self)
         if format_spec in ("s", "sec", "second"):
@@ -186,21 +397,47 @@ class TicTocSpeed:
         return format(self._steps_per_second, format_spec)
 
     def __hash__(self) -> int:
+        """Implement `__hash__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return hash(self._steps_per_second)
 
     def __eq__(self, other: object) -> bool:
+        """Implement `__eq__`.
+
+        Args:
+            other: TODO describe other.
+
+        Returns:
+            TODO describe return value.
+
+        """
         try:
             return self._steps_per_second == _coerce_speed_value(other)
         except TypeError:
             return False
 
     def __lt__(self, other: object) -> bool:
+        """Implement `__lt__`.
+
+        Args:
+            other: TODO describe other.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if _can_coerce_speed(other):
             return self._steps_per_second < _coerce_speed_value(other)
         return NotImplemented
 
 
 def _coerce_speed_value(value: object) -> float:
+    # Internal helper: coerce speed value.
+    """Internal helper: coerce speed value."""
     if isinstance(value, TicTocSpeed):
         return value.steps_per_second
     if isinstance(value, Real):
@@ -209,10 +446,14 @@ def _coerce_speed_value(value: object) -> float:
 
 
 def _can_coerce_speed(value: object) -> bool:
+    # Internal helper: can coerce speed.
+    """Internal helper: can coerce speed."""
     return isinstance(value, (TicTocSpeed, Real))
 
 
 def _best_speed_unit(per_second: float) -> tuple[float, str]:
+    # Internal helper: best speed unit.
+    """Internal helper: best speed unit."""
     if not isfinite(per_second):
         return per_second, "s"
     candidates = (

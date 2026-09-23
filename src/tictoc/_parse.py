@@ -101,6 +101,8 @@ def parse_interval_seconds(value: str) -> float:
 
 
 def _parse_colon_interval(text: str) -> float | None:
+    # Internal helper: parse colon interval.
+    """Internal helper: parse colon interval."""
     sign = -1.0 if text.startswith("-") else 1.0
     unsigned = text[1:] if text[:1] in "+-" else text
     day_part = 0.0
@@ -124,6 +126,8 @@ def _parse_colon_interval(text: str) -> float | None:
 
 
 def _parse_iso_duration(text: str) -> float | None:
+    # Internal helper: parse iso duration.
+    """Internal helper: parse iso duration."""
     pattern = re.compile(
         r"^(?P<sign>[+-])?P"
         r"(?:(?P<days>\d+(?:\.\d+)?)D)?"

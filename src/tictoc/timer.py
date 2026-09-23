@@ -72,6 +72,23 @@ class TicToc(_LoggerAdapterBase):
         clock: Clock | None = None,
         extra: dict[str, Any] | None = None,
     ) -> None:
+        """Implement `__init__`.
+
+        Args:
+            start: TODO describe start.
+            i: TODO describe i.
+            total: TODO describe total.
+            tot: TODO describe tot.
+            logger: TODO describe logger.
+            logger_name: TODO describe logger_name.
+            info_format: TODO describe info_format.
+            progress_format: TODO describe progress_format.
+            total_format: TODO describe total_format.
+            datetime_format: TODO describe datetime_format.
+            clock: TODO describe clock.
+            extra: TODO describe extra.
+
+        """
         actual_logger = logger if logger is not None else logging.getLogger(logger_name)
         super().__init__(actual_logger, extra or {})
 
@@ -110,21 +127,66 @@ class TicToc(_LoggerAdapterBase):
 
     @classmethod
     def now(cls, **kwargs: Any) -> TicToc:
+        """Now.
+
+        Args:
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(None, **kwargs)
 
     @classmethod
     def from_timestamp(cls, value: int | float, **kwargs: Any) -> TicToc:
+        """From timestamp.
+
+        Args:
+            value: TODO describe value.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(value, **kwargs)
 
     @classmethod
     def from_datetime(cls, value: datetime_dt, **kwargs: Any) -> TicToc:
+        """From datetime.
+
+        Args:
+            value: TODO describe value.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(value, **kwargs)
 
     @classmethod
     def from_string(cls, value: str, **kwargs: Any) -> TicToc:
+        """From string.
+
+        Args:
+            value: TODO describe value.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return cls(value, **kwargs)
 
     def copy(self) -> TicToc:
+        """Copy.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return type(self)(
             self,
             logger=self.logger,
@@ -137,29 +199,90 @@ class TicToc(_LoggerAdapterBase):
         )
 
     def __copy__(self) -> TicToc:
+        """Implement `__copy__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.copy()
 
     def __deepcopy__(self, memo: dict[int, Any]) -> TicToc:
+        """Implement `__deepcopy__`.
+
+        Args:
+            memo: TODO describe memo.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.copy()
 
     def __getitem__(self, name: str) -> TicToc:
+        """Implement `__getitem__`.
+
+        Args:
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self._named[name]
 
     def __contains__(self, name: object) -> bool:
+        """Implement `__contains__`.
+
+        Args:
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return name in self._named
 
     @property
     def names(self) -> tuple[str, ...]:
+        """Names.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return tuple(self._named.keys())
 
     @property
     def datetime(self) -> datetime_dt:
+        """Datetime.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.start_time().datetime
 
     def to_datetime(self) -> datetime_dt:
+        """To datetime.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.datetime
 
     def named(self, name: str, *, create: bool = True) -> TicToc:
+        """Named.
+
+        Args:
+            name: TODO describe name.
+            create: TODO describe create.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name not in self._named:
             if not create:
                 raise KeyError(name)
@@ -212,6 +335,18 @@ class TicToc(_LoggerAdapterBase):
         tot: int | float | None = None,
         name: str | None = None,
     ) -> TicToc:
+        """Update.
+
+        Args:
+            i: TODO describe i.
+            total: TODO describe total.
+            tot: TODO describe tot.
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             self.named(name).update(i=i, total=total, tot=tot)
             return self
@@ -225,24 +360,69 @@ class TicToc(_LoggerAdapterBase):
         return self
 
     def toc(self, name: str | None = None) -> TicTocInterval:
+        """Toc.
+
+        Args:
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.elapsed_time(name=name)
 
     def elapsed_time(self, name: str | None = None) -> TicTocInterval:
+        """Elapsed time.
+
+        Args:
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).elapsed_time()
         return TicTocInterval(self._clock() - self._start.timestamp)
 
     def elapsed_origin_time(self, name: str | None = None) -> TicTocInterval:
+        """Elapsed origin time.
+
+        Args:
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).elapsed_origin_time()
         return TicTocInterval(self._clock() - self._origin.timestamp)
 
     def start_time(self, name: str | None = None) -> TicTocTime:
+        """Start time.
+
+        Args:
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).start_time()
         return self._start.copy()
 
     def origin_time(self, name: str | None = None) -> TicTocTime:
+        """Origin time.
+
+        Args:
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).origin_time()
         return self._origin.copy()
@@ -255,6 +435,18 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocSpeed:
+        """Speed.
+
+        Args:
+            i: TODO describe i.
+            method: TODO describe method.
+            n: TODO describe n.
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).speed(i=i, method=method, n=n)
         resolved_i = self._resolve_counter(i)
@@ -274,6 +466,20 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocInterval:
+        """Remaining time.
+
+        Args:
+            i: TODO describe i.
+            total: TODO describe total.
+            tot: TODO describe tot.
+            method: TODO describe method.
+            n: TODO describe n.
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).remaining_time(
                 i=i, total=total, tot=tot, method=method, n=n
@@ -300,6 +506,20 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocInterval:
+        """Total time.
+
+        Args:
+            i: TODO describe i.
+            total: TODO describe total.
+            tot: TODO describe tot.
+            method: TODO describe method.
+            n: TODO describe n.
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).total_time(
                 i=i, total=total, tot=tot, method=method, n=n
@@ -318,6 +538,20 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocTime:
+        """End time.
+
+        Args:
+            i: TODO describe i.
+            total: TODO describe total.
+            tot: TODO describe tot.
+            method: TODO describe method.
+            n: TODO describe n.
+            name: TODO describe name.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if name is not None:
             return self.named(name, create=False).end_time(
                 i=i, total=total, tot=tot, method=method, n=n
@@ -337,6 +571,17 @@ class TicToc(_LoggerAdapterBase):
         *,
         tot: int | float | None = None,
     ) -> float | None:
+        """Percent.
+
+        Args:
+            i: TODO describe i.
+            total: TODO describe total.
+            tot: TODO describe tot.
+
+        Returns:
+            TODO describe return value.
+
+        """
         resolved_i = self._resolve_counter(i)
         resolved_total = self._resolve_total(total, tot)
         if resolved_i is None or resolved_total in (None, 0):
@@ -356,6 +601,23 @@ class TicToc(_LoggerAdapterBase):
         datetime_format: str | None = None,
         **values: Any,
     ) -> str:
+        """Format log.
+
+        Args:
+            template: TODO describe template.
+            i: TODO describe i.
+            total: TODO describe total.
+            tot: TODO describe tot.
+            method: TODO describe method.
+            n: TODO describe n.
+            name: TODO describe name.
+            datetime_format: TODO describe datetime_format.
+            values: TODO describe values.
+
+        Returns:
+            TODO describe return value.
+
+        """
         target = self.named(name, create=False) if name is not None else self
         target.update(i=i, total=total, tot=tot)
 
@@ -381,28 +643,116 @@ class TicToc(_LoggerAdapterBase):
         return _SafeFormatDict(mapping).format(template)
 
     def str_info(self, *args: Any, **kwargs: Any) -> str:
+        """Str info.
+
+        Args:
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.format_log(*args, **kwargs)
 
     def debug(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
+        """Debug.
+
+        Args:
+            msg: TODO describe msg.
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.log(logging.DEBUG, msg, *args, **kwargs)
 
     def info(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
+        """Info.
+
+        Args:
+            msg: TODO describe msg.
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.log(logging.INFO, msg, *args, **kwargs)
 
     def warning(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
+        """Warning.
+
+        Args:
+            msg: TODO describe msg.
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.log(logging.WARNING, msg, *args, **kwargs)
 
     def error(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
+        """Error.
+
+        Args:
+            msg: TODO describe msg.
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
     def critical(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
+        """Critical.
+
+        Args:
+            msg: TODO describe msg.
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.log(logging.CRITICAL, msg, *args, **kwargs)
 
     def exception(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
+        """Exception.
+
+        Args:
+            msg: TODO describe msg.
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         kwargs.setdefault("exc_info", True)
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
     def log(self, level: int, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
+        """Log.
+
+        Args:
+            level: TODO describe level.
+            msg: TODO describe msg.
+            args: TODO describe args.
+            kwargs: TODO describe kwargs.
+
+        Returns:
+            TODO describe return value.
+
+        """
         each = kwargs.pop("each", None)
         i = kwargs.pop("i", None)
         total = kwargs.pop("total", None)
@@ -436,57 +786,128 @@ class TicToc(_LoggerAdapterBase):
         return self
 
     def humanize(self) -> str:
+        """Humanize.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.elapsed_time().humanize()
 
     def __int__(self) -> int:
+        """Implement `__int__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return int(self._start)
 
     def __float__(self) -> float:
+        """Implement `__float__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return float(self._start)
 
     def __bool__(self) -> bool:
+        """Implement `__bool__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return bool(self._start)
 
     def __str__(self) -> str:
+        """Implement `__str__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return self.humanize()
 
     def __repr__(self) -> str:
+        """Implement `__repr__`.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return (
             f"TicToc(start={self._start.timestamp!r}, total={self.total!r}, "
             f"counter={self.counter!r}, names={self.names!r})"
         )
 
     def __format__(self, format_spec: str) -> str:
+        """Implement `__format__`.
+
+        Args:
+            format_spec: TODO describe format_spec.
+
+        Returns:
+            TODO describe return value.
+
+        """
         if format_spec in ("", "human"):
             return str(self)
         return format(self.elapsed_time().seconds, format_spec)
 
     def __eq__(self, other: object) -> bool:
+        """Implement `__eq__`.
+
+        Args:
+            other: TODO describe other.
+
+        Returns:
+            TODO describe return value.
+
+        """
         try:
             return float(self) == _coerce_compare_timestamp(other)
         except TypeError:
             return False
 
     def __lt__(self, other: object) -> bool:
+        """Implement `__lt__`.
+
+        Args:
+            other: TODO describe other.
+
+        Returns:
+            TODO describe return value.
+
+        """
         try:
             return float(self) < _coerce_compare_timestamp(other)
         except TypeError:
             return NotImplemented
 
     def _append_sample(self, counter: float, timestamp: float) -> None:
+        # Internal helper: append sample.
+        """Internal helper: append sample."""
         if self._samples and self._samples[-1].counter == counter:
             return
         self._samples.append(_ProgressSample(counter, timestamp))
 
     def _resolve_counter(self, i: int | float | None) -> float | None:
+        # Internal helper: resolve counter.
+        """Internal helper: resolve counter."""
         if i is not None:
             return float(i)
         return self.counter
 
     def _resolve_total(self, total: int | float | None, tot: int | float | None) -> float | None:
+        # Internal helper: resolve total.
+        """Internal helper: resolve total."""
         return self.total if total is None and tot is None else _coerce_optional_float(total, tot)
 
     def _estimate_rate(self, i: float, *, method: EstimationMethod, n: int | None) -> float:
+        # Internal helper: estimate rate.
+        """Internal helper: estimate rate."""
         normalized = _normalize_method(method)
         now = self._clock()
         if not self._samples or self._samples[-1].counter != i:
@@ -501,6 +922,8 @@ class TicToc(_LoggerAdapterBase):
         return self._origin_rate(i, now=now)
 
     def _origin_rate(self, i: float, *, now: float | None = None) -> float:
+        # Internal helper: origin rate.
+        """Internal helper: origin rate."""
         timestamp = self._clock() if now is None else now
         elapsed = timestamp - self._start.timestamp
         if elapsed <= 0 or i <= 0:
@@ -508,6 +931,8 @@ class TicToc(_LoggerAdapterBase):
         return i / elapsed
 
     def _last_rate(self, i: float) -> float:
+        # Internal helper: last rate.
+        """Internal helper: last rate."""
         samples = _different_counter_tail(self._samples)
         if len(samples) < 2:
             return self._origin_rate(i)
@@ -515,6 +940,8 @@ class TicToc(_LoggerAdapterBase):
         return _rate_between(previous, current, fallback=self._origin_rate(i))
 
     def _moving_rate(self, i: float, *, n: int) -> float:
+        # Internal helper: moving rate.
+        """Internal helper: moving rate."""
         samples = _different_counter_tail(self._samples)
         if len(samples) < 2:
             return self._origin_rate(i)
@@ -522,6 +949,8 @@ class TicToc(_LoggerAdapterBase):
         return _rate_between(window[0], window[-1], fallback=self._origin_rate(i))
 
     def _ema_rate(self, i: float, *, n: int) -> float:
+        # Internal helper: ema rate.
+        """Internal helper: ema rate."""
         samples = _different_counter_tail(self._samples)
         if len(samples) < 2:
             return self._origin_rate(i)
@@ -544,6 +973,8 @@ class TicToc(_LoggerAdapterBase):
         name: str | None,
         datetime_format: str | None,
     ) -> dict[str, Any]:
+        # Internal helper: format values.
+        """Internal helper: format values."""
         elapsed = self.elapsed_time()
         elapsed_origin = self.elapsed_origin_time()
         speed = self.speed(method=method, n=n)
@@ -600,9 +1031,27 @@ class TicToc(_LoggerAdapterBase):
 
 class _SafeFormatDict(dict[str, Any]):
     def __missing__(self, key: str) -> str:
+        """Implement `__missing__`.
+
+        Args:
+            key: TODO describe key.
+
+        Returns:
+            TODO describe return value.
+
+        """
         return "{" + key + "}"
 
     def format(self, template: str) -> str:
+        """Format.
+
+        Args:
+            template: TODO describe template.
+
+        Returns:
+            TODO describe return value.
+
+        """
         formatter = string.Formatter()
         parts: list[str] = []
         for literal, field_name, format_spec, conversion in formatter.parse(template):
@@ -621,6 +1070,8 @@ class _SafeFormatDict(dict[str, Any]):
 
 
 def _add_interval_aliases(values: dict[str, Any], prefix: str, interval: TicTocInterval) -> None:
+    # Internal helper: add interval aliases.
+    """Internal helper: add interval aliases."""
     values[f"{prefix}_s"] = interval.seconds
     values[f"{prefix}_sec"] = interval.seconds
     values[f"{prefix}_seconds"] = interval.seconds
@@ -635,6 +1086,8 @@ def _add_interval_aliases(values: dict[str, Any], prefix: str, interval: TicTocI
 
 
 def _add_speed_aliases(values: dict[str, Any], prefix: str, speed: TicTocSpeed) -> None:
+    # Internal helper: add speed aliases.
+    """Internal helper: add speed aliases."""
     values[f"{prefix}_s"] = speed.steps_per_second
     values[f"{prefix}_sec"] = speed.steps_per_second
     values[f"{prefix}_m"] = speed.steps_per_minute
@@ -645,17 +1098,23 @@ def _add_speed_aliases(values: dict[str, Any], prefix: str, speed: TicTocSpeed) 
 
 
 def _coerce_optional_float(total: int | float | None, tot: int | float | None) -> float | None:
+    # Internal helper: coerce optional float.
+    """Internal helper: coerce optional float."""
     value = total if total is not None else tot
     return None if value is None else float(value)
 
 
 def _friendly_number(value: float | None) -> int | float | None:
+    # Internal helper: friendly number.
+    """Internal helper: friendly number."""
     if value is None:
         return None
     return int(value) if float(value).is_integer() else value
 
 
 def _coerce_compare_timestamp(value: object) -> float:
+    # Internal helper: coerce compare timestamp.
+    """Internal helper: coerce compare timestamp."""
     if isinstance(value, TicToc):
         return float(value)
     if isinstance(value, TicTocTime):
@@ -670,6 +1129,8 @@ def _coerce_compare_timestamp(value: object) -> float:
 def _normalize_method(
     method: EstimationMethod,
 ) -> Literal["origin", "last", "moving", "ema"]:
+    # Internal helper: normalize method.
+    """Internal helper: normalize method."""
     aliases: dict[str, Literal["origin", "last", "moving", "ema"]] = {
         "origin": "origin",
         "average": "origin",
@@ -689,6 +1150,8 @@ def _normalize_method(
 def _different_counter_tail(
     samples: Iterable[_ProgressSample],
 ) -> list[_ProgressSample]:
+    # Internal helper: different counter tail.
+    """Internal helper: different counter tail."""
     filtered: list[_ProgressSample] = []
     for sample in samples:
         if filtered and filtered[-1].counter == sample.counter:
@@ -698,6 +1161,8 @@ def _different_counter_tail(
 
 
 def _rate_between(previous: _ProgressSample, current: _ProgressSample, *, fallback: float) -> float:
+    # Internal helper: rate between.
+    """Internal helper: rate between."""
     delta_counter = current.counter - previous.counter
     delta_time = current.timestamp - previous.timestamp
     if delta_counter <= 0 or delta_time <= 0:
@@ -706,6 +1171,8 @@ def _rate_between(previous: _ProgressSample, current: _ProgressSample, *, fallba
 
 
 def _split_log_kwargs(kwargs: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    # Internal helper: split log kwargs.
+    """Internal helper: split log kwargs."""
     log_kwargs: dict[str, Any] = {}
     format_values: dict[str, Any] = {}
     for key, value in kwargs.items():
@@ -717,6 +1184,8 @@ def _split_log_kwargs(kwargs: dict[str, Any]) -> tuple[dict[str, Any], dict[str,
 
 
 def _should_log(each: int | float | None, i: int | float | None) -> bool:
+    # Internal helper: should log.
+    """Internal helper: should log."""
     if each in (None, 0):
         return True
     if i is None:
