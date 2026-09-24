@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Bumped package/build version from `0.2.4` to `0.2.5`.
+
 ## 0.2.2 - 2026-09-08
 
 - Aligned GitHub Actions workflows with the configreader flow and analogous file names:
