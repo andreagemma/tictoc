@@ -25,7 +25,7 @@ every Python version supported by the project, currently Python 3.10 or newer.
 Install from a GitHub release wheel:
 
 ```bash
-python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.2.0/ga_tictoc-0.2.0-py3-none-any.whl"
+python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.3.0/ga_tictoc-0.3.0-py3-none-any.whl"
 ```
 
 Install from a local checkout:
@@ -296,11 +296,14 @@ message = tt.format_log(
     "{i}/{tot} elapsed={et} eta={rt} speed={v}",
     i=10,
     total=100,
+    _format=True,
 )
 print(message)
 ```
 
 `str_info()` is an alias for `format_log()`.
+Set `_format=True` to substitute timer placeholders. Otherwise, `format_log()`
+returns the template unchanged.
 
 ### Logging Methods
 
@@ -314,7 +317,7 @@ from tictoc import TicToc
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 tt = TicToc(total=100)
-tt.info("{i}/{tot} elapsed={et} eta={rt}", i=10)
+tt.info("{i}/{tot} elapsed={et} eta={rt}", i=10, _format=True)
 ```
 
 Available methods:
@@ -334,18 +337,22 @@ Use `each` to log every N steps:
 ```python
 for i in range(1, 101):
     # Work
-    tt.info("{i}/{tot} elapsed={et}", i=i, each=10)
+    tt.info("{i}/{tot} elapsed={et}", i=i, each=10, _format=True)
 ```
+
+Timer placeholders are substituted only when `_format=True` is passed.
+Without it, the message is passed through unchanged so standard logging
+interpolation with `%` and positional arguments remains available.
 
 Pass logging keyword arguments as usual:
 
 ```python
-tt.info("step {i}", i=10, stacklevel=2)
+tt.info("step {i}", i=10, stacklevel=2, _format=True)
 
 try:
     raise RuntimeError("failed")
 except RuntimeError:
-    tt.exception("job failed after {et}")
+    tt.exception("job failed after {et}", _format=True)
 ```
 
 ### Log Placeholders
@@ -394,15 +401,15 @@ Speed placeholders support suffixes:
 Examples:
 
 ```python
-tt.info("elapsed={et_s:.3f}s eta={rt_m:.1f}min", i=25, total=100)
-tt.info("speed={v_h:.0f} rows/hour", i=25)
-tt.info("end={end:%Y-%m-%d %H:%M}", i=25, total=100)
+tt.info("elapsed={et_s:.3f}s eta={rt_m:.1f}min", i=25, total=100, _format=True)
+tt.info("speed={v_h:.0f} rows/hour", i=25, _format=True)
+tt.info("end={end:%Y-%m-%d %H:%M}", i=25, total=100, _format=True)
 ```
 
 Custom placeholders are also accepted:
 
 ```python
-tt.info("file={filename} elapsed={et}", filename="data.csv")
+tt.info("file={filename} elapsed={et}", filename="data.csv", _format=True)
 ```
 
 ### Casting and Comparison
@@ -849,7 +856,7 @@ tt = TicToc(total=len(items))
 
 for i, item in enumerate(items, start=1):
     # Process item
-    tt.info("{i}/{tot} {percent_str} eta={rt} speed={v}", i=i, each=500)
+    tt.info("{i}/{tot} {percent_str} eta={rt} speed={v}", i=i, each=500, _format=True)
 ```
 
 ### Track Multiple Phases
@@ -895,6 +902,7 @@ message = tt.format_log(
     job="daily-import",
     i=250,
     total=1000,
+    _format=True,
 )
 print(message)
 ```
@@ -910,7 +918,7 @@ use `i + 1`.
 ```python
 for index, item in enumerate(items):
     completed = index + 1
-    tt.info("{completed}/{tot} eta={rt}", i=completed, completed=completed)
+    tt.info("{completed}/{tot} eta={rt}", i=completed, completed=completed, _format=True)
 ```
 
 `total` and `tot` are aliases. Prefer `total` in new code.

@@ -42,7 +42,7 @@ python -m pip install --upgrade ga-tictoc
 Install from a GitHub release:
 
 ```bash
-python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.2.1/ga_tictoc-0.2.1-py3-none-any.whl"
+python -m pip install "https://github.com/andreagemma/tictoc/releases/download/v0.3.0/ga_tictoc-0.3.0-py3-none-any.whl"
 ```
 
 Install from a local source checkout:
@@ -180,10 +180,13 @@ tt = TicToc(total=50)
 
 for i in range(1, 51):
     # Work...
-    tt.info("{i}/{tot} elapsed={et} eta={rt} speed={v}", i=i, each=10)
+    tt.info("{i}/{tot} elapsed={et} eta={rt} speed={v}", i=i, each=10, _format=True)
 ```
 
 `each=10` logs only every 10 steps.
+Timer placeholders are substituted only when `_format=True` is passed.
+Without it, the message is passed through unchanged, allowing normal Python
+logging interpolation with `%` and `*args`.
 
 Available logging methods:
 
@@ -226,7 +229,7 @@ Progress messages support quick placeholders.
 Use suffixes when you want numeric values:
 
 ```python
-tt.info("elapsed={et_s:.2f}s eta={rt_m:.1f}min speed={v_h:.0f}/h", i=i)
+tt.info("elapsed={et_s:.2f}s eta={rt_m:.1f}min speed={v_h:.0f}/h", i=i, _format=True)
 ```
 
 Common suffixes:

@@ -4,7 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-- Bumped package/build version from `0.2.4` to `0.2.5`.
+## 0.3.0 - 2026-10-27
+
+- Documented the timer's public constructor, progress, formatting, and logging
+  APIs.
+- Made timer-placeholder formatting opt-in with `_format=True`, while leaving
+  ordinary logging messages unchanged by default.
+- Preserved `tic()` chaining identity and timer subclasses when copying.
+- Updated third-party license records for the declared test and development
+  tools.
 
 ## 0.2.2 - 2026-09-08
 

@@ -72,22 +72,26 @@ class TicToc(_LoggerAdapterBase):
         clock: Clock | None = None,
         extra: dict[str, Any] | None = None,
     ) -> None:
-        """Implement `__init__`.
+        """Create a timer, optionally initialized from a start instant.
 
         Args:
-            start: TODO describe start.
-            i: TODO describe i.
-            total: TODO describe total.
-            tot: TODO describe tot.
-            logger: TODO describe logger.
-            logger_name: TODO describe logger_name.
-            info_format: TODO describe info_format.
-            progress_format: TODO describe progress_format.
-            total_format: TODO describe total_format.
-            datetime_format: TODO describe datetime_format.
-            clock: TODO describe clock.
-            extra: TODO describe extra.
-
+            start: Initial instant as a timestamp, datetime, string, or timer.
+                Defaults to the current time.
+            i: Initial progress counter.
+            total: Total progress steps; use ``tot`` as an alias.
+            tot: Alias for ``total``.
+            logger: Logger to use; defaults to the logger named by
+                ``logger_name``.
+            logger_name: Name of the logger used when ``logger`` is omitted.
+            info_format: Default message template when no progress counter
+                exists.
+            progress_format: Default template when a counter exists without a
+                total.
+            total_format: Default template when both counter and total exist.
+            datetime_format: Format used to display timer timestamps.
+            clock: Function returning the current timestamp, useful for
+                supplying a custom or test clock.
+            extra: Context values attached to the logger adapter.
         """
         actual_logger = logger if logger is not None else logging.getLogger(logger_name)
         super().__init__(actual_logger, extra or {})
@@ -127,65 +131,60 @@ class TicToc(_LoggerAdapterBase):
 
     @classmethod
     def now(cls, **kwargs: Any) -> TicToc:
-        """Now.
+        """Create a timer starting at the current time.
 
         Args:
-            kwargs: TODO describe kwargs.
+            **kwargs: Additional keyword arguments forwarded to the constructor.
 
         Returns:
-            TODO describe return value.
-
+            A new timer starting now.
         """
         return cls(None, **kwargs)
 
     @classmethod
     def from_timestamp(cls, value: int | float, **kwargs: Any) -> TicToc:
-        """From timestamp.
+        """Create a timer starting at a Unix timestamp.
 
         Args:
-            value: TODO describe value.
-            kwargs: TODO describe kwargs.
+            value: Start time in seconds since the Unix epoch.
+            **kwargs: Additional keyword arguments forwarded to the constructor.
 
         Returns:
-            TODO describe return value.
-
+            A new timer starting at ``value``.
         """
         return cls(value, **kwargs)
 
     @classmethod
     def from_datetime(cls, value: datetime_dt, **kwargs: Any) -> TicToc:
-        """From datetime.
+        """Create a timer starting at a datetime.
 
         Args:
-            value: TODO describe value.
-            kwargs: TODO describe kwargs.
+            value: Datetime to use as the start instant.
+            **kwargs: Additional keyword arguments forwarded to the constructor.
 
         Returns:
-            TODO describe return value.
-
+            A new timer starting at ``value``.
         """
         return cls(value, **kwargs)
 
     @classmethod
     def from_string(cls, value: str, **kwargs: Any) -> TicToc:
-        """From string.
+        """Create a timer starting at a parsed date-time string.
 
         Args:
-            value: TODO describe value.
-            kwargs: TODO describe kwargs.
+            value: String representing the start instant.
+            **kwargs: Additional keyword arguments forwarded to the constructor.
 
         Returns:
-            TODO describe return value.
-
+            A new timer starting at ``value``.
         """
         return cls(value, **kwargs)
 
     def copy(self) -> TicToc:
-        """Copy.
+        """Return an independent copy of the timer state.
 
         Returns:
-            TODO describe return value.
-
+            A timer with copied timing, progress, and named-timer state.
         """
         return type(self)(
             self,
@@ -199,89 +198,81 @@ class TicToc(_LoggerAdapterBase):
         )
 
     def __copy__(self) -> TicToc:
-        """Implement `__copy__`.
+        """Return a shallow copy of this timer.
 
         Returns:
-            TODO describe return value.
-
+            A copied timer instance.
         """
         return self.copy()
 
     def __deepcopy__(self, memo: dict[int, Any]) -> TicToc:
-        """Implement `__deepcopy__`.
+        """Return a copy for the ``copy.deepcopy`` protocol.
 
         Args:
-            memo: TODO describe memo.
+            memo: Deep-copy memo dictionary (not needed for the timer's copy).
 
         Returns:
-            TODO describe return value.
-
+            A copied timer instance.
         """
         return self.copy()
 
     def __getitem__(self, name: str) -> TicToc:
-        """Implement `__getitem__`.
+        """Return the named timer for ``name``.
 
         Args:
-            name: TODO describe name.
+            name: Name of an existing timer.
 
         Returns:
-            TODO describe return value.
-
+            The timer registered under ``name``.
         """
         return self._named[name]
 
     def __contains__(self, name: object) -> bool:
-        """Implement `__contains__`.
+        """Return whether a named timer exists.
 
         Args:
-            name: TODO describe name.
+            name: Value to check against the registered timer names.
 
         Returns:
-            TODO describe return value.
-
+            ``True`` if ``name`` is a registered timer name.
         """
         return name in self._named
 
     @property
     def names(self) -> tuple[str, ...]:
-        """Names.
+        """Return registered timer names in creation order.
 
         Returns:
-            TODO describe return value.
-
+            The names of all timers created by this instance.
         """
         return tuple(self._named.keys())
 
     @property
     def datetime(self) -> datetime_dt:
-        """Datetime.
+        """Return the current timing window's start as a datetime.
 
         Returns:
-            TODO describe return value.
-
+            The datetime corresponding to :meth:`start_time`.
         """
         return self.start_time().datetime
 
     def to_datetime(self) -> datetime_dt:
-        """To datetime.
+        """Convert the current start time to a datetime.
 
         Returns:
-            TODO describe return value.
-
+            The datetime corresponding to :meth:`start_time`.
         """
         return self.datetime
 
     def named(self, name: str, *, create: bool = True) -> TicToc:
-        """Named.
+        """Get a named timer, optionally creating it.
 
         Args:
-            name: TODO describe name.
-            create: TODO describe create.
+            name: Name of the timer.
+            create: If ``False``, raise ``KeyError`` when it does not exist.
 
         Returns:
-            TODO describe return value.
-
+            The named timer.
         """
         if name not in self._named:
             if not create:
@@ -335,17 +326,16 @@ class TicToc(_LoggerAdapterBase):
         tot: int | float | None = None,
         name: str | None = None,
     ) -> TicToc:
-        """Update.
+        """Update the progress counter and optional total.
 
         Args:
-            i: TODO describe i.
-            total: TODO describe total.
-            tot: TODO describe tot.
-            name: TODO describe name.
+            i: New progress counter; records a sample when provided.
+            total: New total number of steps.
+            tot: Alias for ``total``.
+            name: Optional named timer to update.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance.
         """
         if name is not None:
             self.named(name).update(i=i, total=total, tot=tot)
@@ -360,68 +350,63 @@ class TicToc(_LoggerAdapterBase):
         return self
 
     def toc(self, name: str | None = None) -> TicTocInterval:
-        """Toc.
+        """Return elapsed time since the most recent ``tic()``.
 
         Args:
-            name: TODO describe name.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            The elapsed interval.
         """
         return self.elapsed_time(name=name)
 
     def elapsed_time(self, name: str | None = None) -> TicTocInterval:
-        """Elapsed time.
+        """Return elapsed time since the most recent ``tic()``.
 
         Args:
-            name: TODO describe name.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            The elapsed interval.
         """
         if name is not None:
             return self.named(name, create=False).elapsed_time()
         return TicTocInterval(self._clock() - self._start.timestamp)
 
     def elapsed_origin_time(self, name: str | None = None) -> TicTocInterval:
-        """Elapsed origin time.
+        """Return elapsed time since the timer's origin instant.
 
         Args:
-            name: TODO describe name.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            The elapsed interval from the origin.
         """
         if name is not None:
             return self.named(name, create=False).elapsed_origin_time()
         return TicTocInterval(self._clock() - self._origin.timestamp)
 
     def start_time(self, name: str | None = None) -> TicTocTime:
-        """Start time.
+        """Return the most recent timing-window start.
 
         Args:
-            name: TODO describe name.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            A copy of the start timestamp.
         """
         if name is not None:
             return self.named(name, create=False).start_time()
         return self._start.copy()
 
     def origin_time(self, name: str | None = None) -> TicTocTime:
-        """Origin time.
+        """Return the timer's origin instant.
 
         Args:
-            name: TODO describe name.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            A copy of the origin timestamp.
         """
         if name is not None:
             return self.named(name, create=False).origin_time()
@@ -435,17 +420,17 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocSpeed:
-        """Speed.
+        """Estimate processing speed.
 
         Args:
-            i: TODO describe i.
-            method: TODO describe method.
-            n: TODO describe n.
-            name: TODO describe name.
+            i: Current progress counter; records it as a sample if provided.
+            method: Estimation method, such as ``"origin"``, ``"last"``,
+                ``"moving"``, or ``"ema"``.
+            n: Window size for moving or EMA estimates.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            Estimated processing speed in steps per second.
         """
         if name is not None:
             return self.named(name, create=False).speed(i=i, method=method, n=n)
@@ -466,19 +451,18 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocInterval:
-        """Remaining time.
+        """Estimate the time remaining until the configured total is reached.
 
         Args:
-            i: TODO describe i.
-            total: TODO describe total.
-            tot: TODO describe tot.
-            method: TODO describe method.
-            n: TODO describe n.
-            name: TODO describe name.
+            i: Current progress counter.
+            total: Total number of steps.
+            tot: Alias for ``total``.
+            method: Speed-estimation method.
+            n: Window size for moving or EMA estimates.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            Estimated remaining interval, or zero when it cannot be estimated.
         """
         if name is not None:
             return self.named(name, create=False).remaining_time(
@@ -506,19 +490,18 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocInterval:
-        """Total time.
+        """Estimate total time from the timer start through completion.
 
         Args:
-            i: TODO describe i.
-            total: TODO describe total.
-            tot: TODO describe tot.
-            method: TODO describe method.
-            n: TODO describe n.
-            name: TODO describe name.
+            i: Current progress counter.
+            total: Total number of steps.
+            tot: Alias for ``total``.
+            method: Speed-estimation method.
+            n: Window size for moving or EMA estimates.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            Estimated total interval.
         """
         if name is not None:
             return self.named(name, create=False).total_time(
@@ -538,19 +521,18 @@ class TicToc(_LoggerAdapterBase):
         n: int | None = None,
         name: str | None = None,
     ) -> TicTocTime:
-        """End time.
+        """Estimate the completion time.
 
         Args:
-            i: TODO describe i.
-            total: TODO describe total.
-            tot: TODO describe tot.
-            method: TODO describe method.
-            n: TODO describe n.
-            name: TODO describe name.
+            i: Current progress counter.
+            total: Total number of steps.
+            tot: Alias for ``total``.
+            method: Speed-estimation method.
+            n: Window size for moving or EMA estimates.
+            name: Optional named timer to query.
 
         Returns:
-            TODO describe return value.
-
+            Estimated completion timestamp.
         """
         if name is not None:
             return self.named(name, create=False).end_time(
@@ -571,16 +553,15 @@ class TicToc(_LoggerAdapterBase):
         *,
         tot: int | float | None = None,
     ) -> float | None:
-        """Percent.
+        """Calculate progress as a percentage of the total.
 
         Args:
-            i: TODO describe i.
-            total: TODO describe total.
-            tot: TODO describe tot.
+            i: Current progress counter.
+            total: Total number of steps.
+            tot: Alias for ``total``.
 
         Returns:
-            TODO describe return value.
-
+            Progress percentage, or ``None`` if counter or total is unavailable.
         """
         resolved_i = self._resolve_counter(i)
         resolved_total = self._resolve_total(total, tot)
@@ -601,22 +582,23 @@ class TicToc(_LoggerAdapterBase):
         datetime_format: str | None = None,
         **values: Any,
     ) -> str:
-        """Format log.
+        """Render a message using timer and progress placeholders.
 
         Args:
-            template: TODO describe template.
-            i: TODO describe i.
-            total: TODO describe total.
-            tot: TODO describe tot.
-            method: TODO describe method.
-            n: TODO describe n.
-            name: TODO describe name.
-            datetime_format: TODO describe datetime_format.
-            values: TODO describe values.
+            template: Message template; uses the configured default if omitted.
+            i: Progress counter to store before rendering.
+            total: Total number of progress steps.
+            tot: Alias for ``total``.
+            method: Speed-estimation method for time and speed placeholders.
+            n: Window size used by moving or EMA estimates.
+            name: Named timer whose values should be used.
+            datetime_format: Optional override for formatted time placeholders.
+            **values: Additional placeholder values. Set ``_format=True`` to
+                substitute placeholders; otherwise return the template as-is.
 
         Returns:
-            TODO describe return value.
-
+            The rendered message, or the unchanged template when formatting
+            was not requested.
         """
         target = self.named(name, create=False) if name is not None else self
         target.update(i=i, total=total, tot=tot)
@@ -630,128 +612,123 @@ class TicToc(_LoggerAdapterBase):
                 template = target.progress_format
             else:
                 template = target.info_format
-
-        mapping = target._format_values(
-            i=resolved_i,
-            total=resolved_total,
-            method=method,
-            n=n,
-            name=name,
-            datetime_format=datetime_format,
-        )
-        mapping.update(values)
-        return _SafeFormatDict(mapping).format(template)
+        if values.pop("_format", False):
+            mapping = target._format_values(
+                i=resolved_i,
+                total=resolved_total,
+                method=method,
+                n=n,
+                name=name,
+                datetime_format=datetime_format,
+            )
+            mapping.update(values)
+            return _SafeFormatDict(mapping).format(template)
+        return template
 
     def str_info(self, *args: Any, **kwargs: Any) -> str:
-        """Str info.
+        """Return a formatted info message without logging it.
 
         Args:
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            *args: Positional arguments forwarded to :meth:`format_log`.
+            **kwargs: Formatting options and values forwarded to
+                :meth:`format_log`.
 
         Returns:
-            TODO describe return value.
-
+            The formatted or unformatted message string.
         """
         return self.format_log(*args, **kwargs)
 
     def debug(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
-        """Debug.
+        """Log a message at ``DEBUG`` level.
 
         Args:
-            msg: TODO describe msg.
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            msg: Message template or string to log.
+            *args: Positional arguments for standard logging interpolation.
+            **kwargs: Progress, placeholder-formatting, or logging options.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance for method chaining.
         """
         return self.log(logging.DEBUG, msg, *args, **kwargs)
 
     def info(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
-        """Info.
+        """Log a message at ``INFO`` level.
 
         Args:
-            msg: TODO describe msg.
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            msg: Message template or string to log.
+            *args: Positional arguments for standard logging interpolation.
+            **kwargs: Progress, placeholder-formatting, or logging options.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance for method chaining.
         """
         return self.log(logging.INFO, msg, *args, **kwargs)
 
     def warning(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
-        """Warning.
+        """Log a message at ``WARNING`` level.
 
         Args:
-            msg: TODO describe msg.
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            msg: Message template or string to log.
+            *args: Positional arguments for standard logging interpolation.
+            **kwargs: Progress, placeholder-formatting, or logging options.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance for method chaining.
         """
         return self.log(logging.WARNING, msg, *args, **kwargs)
 
     def error(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
-        """Error.
+        """Log a message at ``ERROR`` level.
 
         Args:
-            msg: TODO describe msg.
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            msg: Message template or string to log.
+            *args: Positional arguments for standard logging interpolation.
+            **kwargs: Progress, placeholder-formatting, or logging options.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance for method chaining.
         """
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
     def critical(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
-        """Critical.
+        """Log a message at ``CRITICAL`` level.
 
         Args:
-            msg: TODO describe msg.
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            msg: Message template or string to log.
+            *args: Positional arguments for standard logging interpolation.
+            **kwargs: Progress, placeholder-formatting, or logging options.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance for method chaining.
         """
         return self.log(logging.CRITICAL, msg, *args, **kwargs)
 
     def exception(self, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
-        """Exception.
+        """Log an error message with the current exception information.
 
         Args:
-            msg: TODO describe msg.
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            msg: Message template or string to log.
+            *args: Positional arguments for standard logging interpolation.
+            **kwargs: Progress, placeholder-formatting, or logging options.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance for method chaining.
         """
         kwargs.setdefault("exc_info", True)
         return self.log(logging.ERROR, msg, *args, **kwargs)
 
     def log(self, level: int, msg: str | None = None, *args: Any, **kwargs: Any) -> TicToc:  # type: ignore[override]
-        """Log.
+        """Log a progress message at an arbitrary logging level.
 
         Args:
-            level: TODO describe level.
-            msg: TODO describe msg.
-            args: TODO describe args.
-            kwargs: TODO describe kwargs.
+            level: Logging level, such as ``logging.INFO``.
+            msg: Message template or string to log.
+            *args: Positional arguments for standard logging interpolation.
+            **kwargs: Progress settings (``i``, ``total``, ``each``), optional
+                placeholder formatting, and standard logging options.
 
         Returns:
-            TODO describe return value.
-
+            This timer instance for method chaining.
         """
         each = kwargs.pop("each", None)
         i = kwargs.pop("i", None)
@@ -786,56 +763,50 @@ class TicToc(_LoggerAdapterBase):
         return self
 
     def humanize(self) -> str:
-        """Humanize.
+        """Return the elapsed interval in a human-readable form.
 
         Returns:
-            TODO describe return value.
-
+            A compact string representing elapsed time.
         """
         return self.elapsed_time().humanize()
 
     def __int__(self) -> int:
-        """Implement `__int__`.
+        """Convert the start timestamp to an integer.
 
         Returns:
-            TODO describe return value.
-
+            The integer Unix timestamp of the current start.
         """
         return int(self._start)
 
     def __float__(self) -> float:
-        """Implement `__float__`.
+        """Convert the start timestamp to a float.
 
         Returns:
-            TODO describe return value.
-
+            The Unix timestamp of the current start.
         """
         return float(self._start)
 
     def __bool__(self) -> bool:
-        """Implement `__bool__`.
+        """Return whether the start timestamp is non-zero.
 
         Returns:
-            TODO describe return value.
-
+            The truth value of the start timestamp.
         """
         return bool(self._start)
 
     def __str__(self) -> str:
-        """Implement `__str__`.
+        """Return a human-readable elapsed-time string.
 
         Returns:
-            TODO describe return value.
-
+            The formatted elapsed interval.
         """
         return self.humanize()
 
     def __repr__(self) -> str:
-        """Implement `__repr__`.
+        """Return an informative representation of the timer.
 
         Returns:
-            TODO describe return value.
-
+            A string containing the start, progress, and named timers.
         """
         return (
             f"TicToc(start={self._start.timestamp!r}, total={self.total!r}, "
@@ -843,28 +814,26 @@ class TicToc(_LoggerAdapterBase):
         )
 
     def __format__(self, format_spec: str) -> str:
-        """Implement `__format__`.
+        """Format elapsed seconds using a Python format specification.
 
         Args:
-            format_spec: TODO describe format_spec.
+            format_spec: Numeric format specification, or ``"human"``.
 
         Returns:
-            TODO describe return value.
-
+            Formatted elapsed time.
         """
         if format_spec in ("", "human"):
             return str(self)
         return format(self.elapsed_time().seconds, format_spec)
 
     def __eq__(self, other: object) -> bool:
-        """Implement `__eq__`.
+        """Compare this timer's start timestamp for equality.
 
         Args:
-            other: TODO describe other.
+            other: Timestamp-like value to compare.
 
         Returns:
-            TODO describe return value.
-
+            Whether the timestamps are equal.
         """
         try:
             return float(self) == _coerce_compare_timestamp(other)
@@ -872,14 +841,13 @@ class TicToc(_LoggerAdapterBase):
             return False
 
     def __lt__(self, other: object) -> bool:
-        """Implement `__lt__`.
+        """Compare this timer's start timestamp with another value.
 
         Args:
-            other: TODO describe other.
+            other: Timestamp-like value to compare.
 
         Returns:
-            TODO describe return value.
-
+            Whether this timer's timestamp is earlier.
         """
         try:
             return float(self) < _coerce_compare_timestamp(other)
@@ -1031,26 +999,24 @@ class TicToc(_LoggerAdapterBase):
 
 class _SafeFormatDict(dict[str, Any]):
     def __missing__(self, key: str) -> str:
-        """Implement `__missing__`.
+        """Return the original placeholder for an unknown key.
 
         Args:
-            key: TODO describe key.
+            key: Missing mapping key.
 
         Returns:
-            TODO describe return value.
-
+            The key enclosed in braces.
         """
         return "{" + key + "}"
 
     def format(self, template: str) -> str:
-        """Format.
+        """Format a template while preserving unknown placeholders.
 
         Args:
-            template: TODO describe template.
+            template: String containing Python-style replacement fields.
 
         Returns:
-            TODO describe return value.
-
+            Formatted string with unknown fields left unchanged.
         """
         formatter = string.Formatter()
         parts: list[str] = []

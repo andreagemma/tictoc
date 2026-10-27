@@ -31,6 +31,15 @@ class TestTicToc:
         assert isinstance(timer.start_time(), TicTocTime)
         assert float(timer) == 105
 
+    def test_tic_returns_same_timer_and_copy_preserves_subclass(self) -> None:
+        class CustomTicToc(TicToc):
+            pass
+
+        timer = CustomTicToc(clock=FakeClock(0))
+
+        assert timer.tic() is timer
+        assert isinstance(timer.copy(), CustomTicToc)
+
     def test_named_timers(self) -> None:
         clock = FakeClock(0)
         timer = TicToc(clock=clock)
@@ -76,10 +85,23 @@ class TestTicToc:
         clock = FakeClock(0)
         timer = TicToc(total=10, logger=logger, clock=clock)
         clock.advance(10)
-        returned = timer.info("{i}/{tot} {et_s:.0f}s {rt_s:.0f}s {v_s:.1f}/s", i=5)
+        returned = timer.info("{i}/{tot} {et_s:.0f}s {rt_s:.0f}s {v_s:.1f}/s", i=5, _format=True)
 
         assert returned is timer
         assert "INFO:5/10 10s 10s 0.5/s" in stream.getvalue()
+
+    def test_logging_formats_placeholders_only_when_requested(self) -> None:
+        stream = io.StringIO()
+        logger = logging.getLogger("tictoc-format-option-test")
+        logger.handlers.clear()
+        logger.setLevel(logging.INFO)
+        logger.addHandler(logging.StreamHandler(stream))
+        timer = TicToc(logger=logger, clock=FakeClock(0))
+
+        timer.info("step {i}", i=4)
+        timer.info("step {i}", i=5, _format=True)
+
+        assert stream.getvalue().splitlines() == ["step {i}", "step 5"]
 
     def test_logging_each_filter(self) -> None:
         stream = io.StringIO()
@@ -90,5 +112,5 @@ class TestTicToc:
 
         timer = TicToc(logger=logger, clock=FakeClock(0))
         timer.info("hidden", i=3, each=2)
-        timer.info("visible {i}", i=4, each=2)
+        timer.info("visible {i}", i=4, each=2, _format=True)
         assert stream.getvalue().strip() == "visible 4"
